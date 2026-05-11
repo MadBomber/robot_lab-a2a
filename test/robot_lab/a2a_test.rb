@@ -43,7 +43,7 @@ class RobotLab::TestA2A < Minitest::Test
   def test_network_adapter_rejects_interactive_modes
     network = Object.new
     assert_raises(ArgumentError) do
-      RobotLab::A2A::NetworkAdapter.new(network, interactive: :acp_tool)
+      RobotLab::A2A::NetworkAdapter.new(network, interactive: :a2a_tool)
     end
   end
 

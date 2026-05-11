@@ -11,13 +11,13 @@ module RobotLab
     #
     # interactive modes:
     #   :none      — robot runs sync; AskUser would block stdin (not recommended)
-    #   :acp_tool  — A2A::AskUserTool replaces AskUser; Thread+Queue bridge
+    #   :a2a_tool  — A2A::AskUserTool replaces AskUser; Thread+Queue bridge
     #   :io_bridge — IoBridge replaces robot.input/output; Thread+Queue bridge
     #
     # Interactive modes keep the robot thread alive between A2A INPUT_REQUIRED
     # and resume. Only works with in-process (Memory) storage.
     class RobotAdapter < ::A2A::Server::AgentExecutor
-      VALID_MODES = %i[none acp_tool io_bridge].freeze
+      VALID_MODES = %i[none a2a_tool io_bridge].freeze
 
       def initialize(robot, interactive: :none)
         unless VALID_MODES.include?(interactive)
@@ -35,7 +35,7 @@ module RobotLab
         case @interactive
         when :none
           run_simple(context, input_text)
-        when :acp_tool, :io_bridge
+        when :a2a_tool, :io_bridge
           run_interactive(context, input_text, task_id)
         end
       end
@@ -138,14 +138,14 @@ module RobotLab
 
       def setup_interactive_mode(robot, event_queue, answer_queue)
         case @interactive
-        when :acp_tool  then inject_ask_user_tool(robot, event_queue, answer_queue)
+        when :a2a_tool  then inject_ask_user_tool(robot, event_queue, answer_queue)
         when :io_bridge then inject_io_bridge(robot, event_queue, answer_queue)
         end
       end
 
       def teardown_interactive_mode(robot)
         case @interactive
-        when :acp_tool
+        when :a2a_tool
           restore_tools(robot)
         when :io_bridge
           robot.input  = nil

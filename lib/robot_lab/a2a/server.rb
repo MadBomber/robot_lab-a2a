@@ -14,7 +14,7 @@ module RobotLab
     #   server.run(port: 9292)
     #
     # @example Interactive robot (AskUser bridged to A2A input_required)
-    #   server = RobotLab::A2A::Server.new(interactive: :acp_tool)
+    #   server = RobotLab::A2A::Server.new(interactive: :a2a_tool)
     #   server.add_robot(my_robot)
     #   server.run(port: 9292)
     #

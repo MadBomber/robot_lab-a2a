@@ -5,7 +5,18 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in robot_lab-a2a.gemspec
 gemspec
 
-gem "irb"
-gem "rake", "~> 13.0"
+gem "robot_lab", path: "../robot_lab"
 
-gem "minitest", "~> 5.16"
+group :development, :test do
+  gem 'aigcm'
+  gem "irb"
+  gem "rake"
+  gem "minitest"
+  gem "debug_me"
+  gem "rubocop"
+  gem "flog"
+end
+
+group :test do
+  gem "simplecov", require: false
+end
