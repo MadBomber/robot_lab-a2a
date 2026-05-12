@@ -8,6 +8,20 @@
 #
 # Or run both together:
 #   bundle exec ruby examples/run 01_sync_robot
+#
+# What this demo shows:
+#
+#   Discovery  — client.agent_card fetches the agent's name, description, and
+#                skills declared by the robot and published over A2A.
+#
+#   Task send  — client.send_task dispatches a user message and returns a
+#                completed task whose artifact holds the robot's reply.
+#
+#   Task list  — client.list_tasks returns all tasks the agent has processed,
+#                demonstrating the A2A task-store query interface.
+#
+#   Task get   — client.get_task(id) retrieves a specific completed task by ID,
+#                confirming the reply is durable and addressable after the fact.
 
 require_relative '../common_config'
 
@@ -20,10 +34,12 @@ client = A2A.client(url: URL)
 # ---------------------------------------------------------------------------
 puts '=== Agent Card ==='
 card = client.agent_card
-puts "  Name:        #{card.name}"
-puts "  Description: #{card.description}"
-puts "  Skills:      #{card.skills.map(&:name).join(', ')}"
-puts
+puts <<~HEREDOC
+    Name:        #{card.name}
+    Description: #{card.description}
+    Skills:      #{card.skills.map(&:name).join(', ')}
+
+HEREDOC
 
 # ---------------------------------------------------------------------------
 # 2. Send tasks and inspect replies
@@ -38,10 +54,12 @@ puts '=== Sending Tasks ==='
 task_ids = messages.map do |text|
   task  = client.send_task(message: A2A::Models::Message.user(text))
   reply = task.artifacts.first&.parts&.first&.text || '(no reply)'
-  puts "  [#{task.status.state}]"
-  puts "    sent: #{text.inspect}"
-  puts "    got:  #{reply.inspect}"
-  puts
+  puts <<~HEREDOC
+    [#{task.status.state}]
+      sent: #{text.inspect}
+      got:  #{reply.inspect}
+
+  HEREDOC
   task.id
 end
 
@@ -59,10 +77,12 @@ puts
 # ---------------------------------------------------------------------------
 puts '=== Retrieve Task ==='
 retrieved = client.get_task(task_ids.first)
-puts "  id:    #{retrieved.id}"
-puts "  state: #{retrieved.status.state}"
-puts "  reply: #{retrieved.artifacts.first&.parts&.first&.text.inspect}"
-puts
+puts <<~HEREDOC
+    id:    #{retrieved.id}
+    state: #{retrieved.status.state}
+    reply: #{retrieved.artifacts.first&.parts&.first&.text.inspect}
+
+HEREDOC
 
 # ---------------------------------------------------------------------------
 # 5. Verify

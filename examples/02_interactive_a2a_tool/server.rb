@@ -11,15 +11,18 @@
 # resume call (from an A2A client that supports task resume) unblocks the thread
 # and allows the robot to finish.
 #
-# This demo shows the first half of that flow: the robot correctly enters
-# input_required when the injected tool is called. Full end-to-end resume
-# requires an A2A client that issues a tasks/send with the original task ID
-# (supported by simple_a2a >= 0.4).
+# This demo shows the full two-turn flow: the robot enters input_required when
+# the injected tool is called; the client resumes using the same task ID; the
+# robot unblocks and completes the task (requires simple_a2a >= 0.3.1).
+#
+# AskUserTool is invoked with optional choices: and default: params. These are
+# formatted into the input_required status message as a numbered choice list
+# and a default-value hint, which the client receives and can display.
 #
 # To use a real LLM robot instead:
 #   require "robot_lab"
 #   robot = RobotLab.build(name: "greeter", system_prompt: "You are a friendly greeter...")
-#   # Add RobotLab::AskUser to the robot's tools so the LLM can ask questions.
+#   # Add RobotLab::AskUser to the robot's tools so the LLM can call it.
 #   server = RobotLab::A2A::Server.new(interactive: :a2a_tool)
 #   server.add_robot(robot)
 
@@ -46,7 +49,11 @@ class PersonalGreeterRobot
     ask_tool = @local_tools.find { |t| t.is_a?(RobotLab::A2A::AskUserTool) }
 
     name = if ask_tool
-             ask_tool.execute(question: 'What is your name?')
+             ask_tool.execute(
+               question: 'What is your name?',
+               choices:  %w[Alice Bob Charlie],
+               default:  'Friend'
+             )
            else
              'stranger'
            end
@@ -61,9 +68,11 @@ end
 server = RobotLab::A2A::Server.new(host: 'localhost', port: 9292, interactive: :a2a_tool)
 server.add_robot(PersonalGreeterRobot.new)
 
-puts 'Starting PersonalGreeterRobot on http://localhost:9292/personal-greeter'
-puts 'Interactive mode: :a2a_tool  (AskUserTool injection)'
-puts 'Press Ctrl-C to stop.'
-puts
+puts <<~HEREDOC
+  Starting PersonalGreeterRobot on http://localhost:9292/personal-greeter
+  Interactive mode: :a2a_tool  (AskUserTool injection)
+  Press Ctrl-C to stop.
+
+HEREDOC
 
 server.run

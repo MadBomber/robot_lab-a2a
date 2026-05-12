@@ -36,8 +36,10 @@ end
 server = RobotLab::A2A::Server.new(host: 'localhost', port: 9292)
 server.add_robot(EchoRobot.new)
 
-puts 'Starting EchoRobot on http://localhost:9292/echo-robot'
-puts 'Press Ctrl-C to stop.'
-puts
+puts <<~HEREDOC
+  Starting EchoRobot on http://localhost:9292/echo-robot
+  Press Ctrl-C to stop.
+
+HEREDOC
 
 server.run

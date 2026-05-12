@@ -67,9 +67,11 @@ server.add_network(
   description: 'Three-stage text pipeline: analyse → format → summarise'
 )
 
-puts 'Starting EditorialPipeline on http://localhost:9292/editorial-pipeline'
-puts 'Stages: AnalyserRobot → FormatterRobot → SummaryRobot'
-puts 'Press Ctrl-C to stop.'
-puts
+puts <<~HEREDOC
+  Starting EditorialPipeline on http://localhost:9292/editorial-pipeline
+  Stages: AnalyserRobot → FormatterRobot → SummaryRobot
+  Press Ctrl-C to stop.
+
+HEREDOC
 
 server.run

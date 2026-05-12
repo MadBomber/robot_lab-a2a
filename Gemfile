@@ -6,7 +6,6 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'robot_lab',  path: '../robot_lab'
-gem 'simple_a2a', path: '../simple_a2a'
 
 group :development, :test do
   gem 'aigcm'

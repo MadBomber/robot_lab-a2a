@@ -8,6 +8,14 @@
 #
 # Or run both together:
 #   bundle exec ruby examples/run 03_robot_network
+#
+# What this demo shows:
+#
+#   A RobotLab::Network (a pipeline of cooperating robots) exposed as a single
+#   A2A agent via NetworkAdapter. The client sends raw text and receives output
+#   that has passed through all three pipeline stages in sequence. From the A2A
+#   protocol's point of view this is one agent with one task — the internal
+#   multi-robot structure is completely invisible across the HTTP boundary.
 
 require_relative '../common_config'
 
@@ -20,10 +28,12 @@ client = A2A.client(url: URL)
 # ---------------------------------------------------------------------------
 puts '=== Agent Card ==='
 card = client.agent_card
-puts "  Name:        #{card.name}"
-puts "  Description: #{card.description}"
-puts "  Skills:      #{card.skills.map(&:name).join(', ')}"
-puts
+puts <<~HEREDOC
+    Name:        #{card.name}
+    Description: #{card.description}
+    Skills:      #{card.skills.map(&:name).join(', ')}
+
+HEREDOC
 
 # ---------------------------------------------------------------------------
 # 2. Send documents through the pipeline
@@ -39,10 +49,12 @@ results = documents.map do |doc|
   task   = client.send_task(message: A2A::Models::Message.user(doc))
   output = task.artifacts.first&.parts&.first&.text || '(no output)'
 
-  puts "  Input:  #{doc.inspect}"
-  puts "  Output: #{output.inspect}"
-  puts "  State:  #{task.status.state}"
-  puts
+  puts <<~HEREDOC
+    Input:  #{doc.inspect}
+    Output: #{output.inspect}
+    State:  #{task.status.state}
+
+  HEREDOC
   { task: task, output: output }
 end
 
@@ -57,11 +69,13 @@ checks = results.map do |r|
   formatted  = output.match?(/[A-Z]/)
   summarised = output.start_with?('SUMMARY')
 
-  puts "  completed  : #{completed  ? 'PASS' : 'FAIL'}"
-  puts "  analysed   : #{analysed   ? 'PASS' : 'FAIL'}"
-  puts "  formatted  : #{formatted  ? 'PASS' : 'FAIL'}"
-  puts "  summarised : #{summarised ? 'PASS' : 'FAIL'}"
-  puts
+  puts <<~HEREDOC
+    completed  : #{completed  ? 'PASS' : 'FAIL'}
+    analysed   : #{analysed   ? 'PASS' : 'FAIL'}
+    formatted  : #{formatted  ? 'PASS' : 'FAIL'}
+    summarised : #{summarised ? 'PASS' : 'FAIL'}
+
+  HEREDOC
 
   completed && analysed && formatted && summarised
 end
