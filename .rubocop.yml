@@ -1,0 +1,26 @@
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - 'examples/**/*'
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 25
+  CountAsOne:
+    - heredoc
+    - array
+    - hash
+
+Metrics/AbcSize:
+  Max: 25
+
+Metrics/ClassLength:
+  Max: 150
+
+Metrics/BlockLength:
+  Exclude:
+    - 'Rakefile'
+    - '*.gemspec'

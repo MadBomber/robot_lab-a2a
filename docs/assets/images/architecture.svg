@@ -1,0 +1,258 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="900" height="600">
+  <rect width="900" height="600" fill="#0e0e14"/>
+
+  <!-- ── Title ── -->
+  <text x="450" y="36" text-anchor="middle" fill="#e0e0f0" font-family="Roboto Mono, Consolas, monospace" font-size="18" font-weight="bold">robot_lab-a2a  —  Architecture</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       Column labels
+  ══════════════════════════════════════════════════════════════ -->
+  <text x="68"  y="68" text-anchor="middle" fill="#888" font-family="Roboto Mono, monospace" font-size="10">CLIENT</text>
+  <text x="230" y="68" text-anchor="middle" fill="#888" font-family="Roboto Mono, monospace" font-size="10">HTTP LAYER</text>
+  <text x="450" y="68" text-anchor="middle" fill="#888" font-family="Roboto Mono, monospace" font-size="10">ADAPTER LAYER</text>
+  <text x="700" y="68" text-anchor="middle" fill="#888" font-family="Roboto Mono, monospace" font-size="10">ROBOT LAYER</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       A2A CLIENT  (col 1)
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="14" y="80" width="108" height="440" rx="8" fill="#1a1030" stroke="#6633bb" stroke-width="1.5"/>
+  <text x="68" y="100" text-anchor="middle" fill="#bb88ff" font-family="Roboto Mono, monospace" font-size="11" font-weight="bold">A2A Client</text>
+
+  <!-- SDK box -->
+  <rect x="24" y="110" width="88" height="34" rx="5" fill="#2a1f50" stroke="#7755cc" stroke-width="1"/>
+  <text x="68" y="124" text-anchor="middle" fill="#ccaaff" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">Ruby SDK</text>
+  <text x="68" y="137" text-anchor="middle" fill="#9977cc" font-family="Roboto Mono, monospace" font-size="8">A2A.client(url:)</text>
+
+  <!-- curl box -->
+  <rect x="24" y="154" width="88" height="26" rx="5" fill="#2a1f50" stroke="#7755cc" stroke-width="1"/>
+  <text x="68" y="171" text-anchor="middle" fill="#ccaaff" font-family="Roboto Mono, monospace" font-size="9">curl / HTTP</text>
+
+  <!-- tasks/send -->
+  <rect x="24" y="200" width="88" height="50" rx="5" fill="#1e1440" stroke="#5533aa" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="68" y="215" text-anchor="middle" fill="#aa88ee" font-family="Roboto Mono, monospace" font-size="8">tasks/send</text>
+  <text x="68" y="228" text-anchor="middle" fill="#8866cc" font-family="Roboto Mono, monospace" font-size="8">tasks/get</text>
+  <text x="68" y="241" text-anchor="middle" fill="#8866cc" font-family="Roboto Mono, monospace" font-size="8">tasks/cancel</text>
+
+  <!-- input_required round-trip note -->
+  <rect x="24" y="268" width="88" height="44" rx="5" fill="#2a1040" stroke="#cc44bb" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="68" y="283" text-anchor="middle" fill="#ee88dd" font-family="Roboto Mono, monospace" font-size="8">input_required</text>
+  <text x="68" y="296" text-anchor="middle" fill="#cc66bb" font-family="Roboto Mono, monospace" font-size="8">→ send reply</text>
+  <text x="68" y="308" text-anchor="middle" fill="#cc66bb" font-family="Roboto Mono, monospace" font-size="8">  with task_id</text>
+
+  <!-- agentCard -->
+  <rect x="24" y="328" width="88" height="26" rx="5" fill="#1e1440" stroke="#5533aa" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="68" y="345" text-anchor="middle" fill="#aa88ee" font-family="Roboto Mono, monospace" font-size="8">GET agentCard</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       HTTP LAYER — simple_a2a  (col 2)
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="140" y="80" width="180" height="440" rx="8" fill="#0e1e30" stroke="#3388cc" stroke-width="1.5"/>
+  <text x="230" y="100" text-anchor="middle" fill="#66bbff" font-family="Roboto Mono, monospace" font-size="11" font-weight="bold">simple_a2a</text>
+
+  <!-- Falcon/Rack -->
+  <rect x="152" y="110" width="156" height="30" rx="5" fill="#0d2a40" stroke="#2277aa" stroke-width="1"/>
+  <text x="230" y="121" text-anchor="middle" fill="#55aaee" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">Falcon HTTP server</text>
+  <text x="230" y="133" text-anchor="middle" fill="#3388bb" font-family="Roboto Mono, monospace" font-size="8">JSON-RPC 2.0  /  SSE</text>
+
+  <!-- App router -->
+  <rect x="152" y="150" width="156" height="50" rx="5" fill="#0d2a40" stroke="#2277aa" stroke-width="1"/>
+  <text x="230" y="165" text-anchor="middle" fill="#55aaee" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">App (Roda)</text>
+  <text x="230" y="178" text-anchor="middle" fill="#3388bb" font-family="Roboto Mono, monospace" font-size="8">dispatch → handle_send</text>
+  <text x="230" y="191" text-anchor="middle" fill="#3388bb" font-family="Roboto Mono, monospace" font-size="8">handle_get / cancel / list</text>
+
+  <!-- Context / ResumeContext -->
+  <rect x="152" y="212" width="72" height="44" rx="5" fill="#0d2233" stroke="#1a5577" stroke-width="1"/>
+  <text x="188" y="227" text-anchor="middle" fill="#44aacc" font-family="Roboto Mono, monospace" font-size="8" font-weight="bold">Context</text>
+  <text x="188" y="239" text-anchor="middle" fill="#2288aa" font-family="Roboto Mono, monospace" font-size="7">task, message</text>
+  <text x="188" y="250" text-anchor="middle" fill="#2288aa" font-family="Roboto Mono, monospace" font-size="7">storage, events</text>
+
+  <rect x="234" y="212" width="74" height="44" rx="5" fill="#1a1040" stroke="#cc44bb" stroke-width="1"/>
+  <text x="271" y="227" text-anchor="middle" fill="#ee88dd" font-family="Roboto Mono, monospace" font-size="8" font-weight="bold">ResumeContext</text>
+  <text x="271" y="239" text-anchor="middle" fill="#cc66bb" font-family="Roboto Mono, monospace" font-size="7">resume_message</text>
+  <text x="271" y="250" text-anchor="middle" fill="#cc66bb" font-family="Roboto Mono, monospace" font-size="7">task_id routing</text>
+
+  <!-- Storage -->
+  <rect x="152" y="268" width="156" height="34" rx="5" fill="#0d2a40" stroke="#2277aa" stroke-width="1"/>
+  <text x="230" y="281" text-anchor="middle" fill="#55aaee" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">Storage::Memory</text>
+  <text x="230" y="294" text-anchor="middle" fill="#3388bb" font-family="Roboto Mono, monospace" font-size="8">task persistence (in-process)</text>
+
+  <!-- AgentCard -->
+  <rect x="152" y="314" width="156" height="30" rx="5" fill="#0d2a40" stroke="#2277aa" stroke-width="1"/>
+  <text x="230" y="326" text-anchor="middle" fill="#55aaee" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">AgentCard</text>
+  <text x="230" y="339" text-anchor="middle" fill="#3388bb" font-family="Roboto Mono, monospace" font-size="8">name, skills, capabilities</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ADAPTER LAYER  (col 3)
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="338" y="80" width="224" height="440" rx="8" fill="#0e1e16" stroke="#33aa66" stroke-width="1.5"/>
+  <text x="450" y="100" text-anchor="middle" fill="#66ee99" font-family="Roboto Mono, monospace" font-size="11" font-weight="bold">RobotLab::A2A</text>
+
+  <!-- Server builder -->
+  <rect x="350" y="110" width="200" height="34" rx="5" fill="#0a2818" stroke="#228855" stroke-width="1"/>
+  <text x="450" y="125" text-anchor="middle" fill="#44dd88" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">Server</text>
+  <text x="450" y="138" text-anchor="middle" fill="#229955" font-family="Roboto Mono, monospace" font-size="8">add_robot  /  add_network  /  run  /  to_app</text>
+
+  <!-- RobotAdapter -->
+  <rect x="350" y="156" width="200" height="118" rx="5" fill="#0a2818" stroke="#228855" stroke-width="1"/>
+  <text x="450" y="172" text-anchor="middle" fill="#44dd88" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">RobotAdapter</text>
+
+  <!-- :none -->
+  <rect x="360" y="180" width="56" height="22" rx="3" fill="#062010" stroke="#115533" stroke-width="1"/>
+  <text x="388" y="195" text-anchor="middle" fill="#33bb77" font-family="Roboto Mono, monospace" font-size="8">:none</text>
+
+  <!-- :a2a_tool -->
+  <rect x="424" y="180" width="60" height="22" rx="3" fill="#1a1040" stroke="#cc44bb" stroke-width="1"/>
+  <text x="454" y="195" text-anchor="middle" fill="#ee88dd" font-family="Roboto Mono, monospace" font-size="8">:a2a_tool</text>
+
+  <!-- :io_bridge -->
+  <rect x="492" y="180" width="52" height="22" rx="3" fill="#0a1e30" stroke="#3388cc" stroke-width="1"/>
+  <text x="518" y="195" text-anchor="middle" fill="#66bbff" font-family="Roboto Mono, monospace" font-size="8">:io_bridge</text>
+
+  <!-- AskUserTool -->
+  <rect x="360" y="212" width="86" height="52" rx="3" fill="#1a1040" stroke="#cc44bb" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="403" y="227" text-anchor="middle" fill="#ee88dd" font-family="Roboto Mono, monospace" font-size="8" font-weight="bold">AskUserTool</text>
+  <text x="403" y="240" text-anchor="middle" fill="#cc66bb" font-family="Roboto Mono, monospace" font-size="7">push event_queue</text>
+  <text x="403" y="252" text-anchor="middle" fill="#cc66bb" font-family="Roboto Mono, monospace" font-size="7">block answer_queue</text>
+
+  <!-- IoBridge -->
+  <rect x="454" y="212" width="88" height="52" rx="3" fill="#0a1e30" stroke="#3388cc" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="498" y="227" text-anchor="middle" fill="#66bbff" font-family="Roboto Mono, monospace" font-size="8" font-weight="bold">IoBridge</text>
+  <text x="498" y="240" text-anchor="middle" fill="#3388aa" font-family="Roboto Mono, monospace" font-size="7">buffer write/puts</text>
+  <text x="498" y="252" text-anchor="middle" fill="#3388aa" font-family="Roboto Mono, monospace" font-size="7">gets → block queue</text>
+
+  <!-- Thread box -->
+  <rect x="360" y="274" width="88" height="26" rx="3" fill="#0a1a10" stroke="#115533" stroke-width="1"/>
+  <text x="404" y="287" text-anchor="middle" fill="#44cc77" font-family="Roboto Mono, monospace" font-size="8">Thread (per call)</text>
+  <text x="404" y="299" text-anchor="middle" fill="#228844" font-family="Roboto Mono, monospace" font-size="7">robot.run(input)</text>
+
+  <!-- NetworkAdapter -->
+  <rect x="350" y="312" width="200" height="50" rx="5" fill="#0a2818" stroke="#228855" stroke-width="1"/>
+  <text x="450" y="328" text-anchor="middle" fill="#44dd88" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">NetworkAdapter  (:none)</text>
+  <text x="450" y="341" text-anchor="middle" fill="#229955" font-family="Roboto Mono, monospace" font-size="8">network.run(message:)</text>
+  <text x="450" y="353" text-anchor="middle" fill="#229955" font-family="Roboto Mono, monospace" font-size="8">.last_text_content</text>
+
+  <!-- Registry -->
+  <rect x="350" y="376" width="200" height="58" rx="5" fill="#1e1a00" stroke="#ccaa00" stroke-width="1.5"/>
+  <text x="450" y="393" text-anchor="middle" fill="#ffdd44" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">Registry  (Mutex)</text>
+  <text x="450" y="407" text-anchor="middle" fill="#cc9900" font-family="Roboto Mono, monospace" font-size="8">task_id → Entry</text>
+  <text x="450" y="419" text-anchor="middle" fill="#cc9900" font-family="Roboto Mono, monospace" font-size="8">Entry: thread | event_queue</text>
+  <text x="450" y="431" text-anchor="middle" fill="#cc9900" font-family="Roboto Mono, monospace" font-size="8">       | answer_queue</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ROBOT LAYER  (col 4)
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="580" y="80" width="306" height="440" rx="8" fill="#1e1205" stroke="#dd8822" stroke-width="1.5"/>
+  <text x="733" y="100" text-anchor="middle" fill="#ffaa44" font-family="Roboto Mono, monospace" font-size="11" font-weight="bold">RobotLab</text>
+
+  <!-- Robot box -->
+  <rect x="592" y="110" width="138" height="160" rx="5" fill="#281600" stroke="#aa6600" stroke-width="1"/>
+  <text x="661" y="128" text-anchor="middle" fill="#ffaa44" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">Robot</text>
+  <text x="661" y="143" text-anchor="middle" fill="#cc8833" font-family="Roboto Mono, monospace" font-size="8">robot.name</text>
+  <text x="661" y="156" text-anchor="middle" fill="#cc8833" font-family="Roboto Mono, monospace" font-size="8">robot.description</text>
+  <text x="661" y="169" text-anchor="middle" fill="#cc8833" font-family="Roboto Mono, monospace" font-size="8">robot.run(text) → reply</text>
+
+  <!-- AskUser tool (inside robot) -->
+  <rect x="602" y="182" width="118" height="36" rx="3" fill="#1e0e00" stroke="#cc6600" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="661" y="197" text-anchor="middle" fill="#ffaa55" font-family="Roboto Mono, monospace" font-size="8">RobotLab::AskUser</text>
+  <text x="661" y="209" text-anchor="middle" fill="#aa6633" font-family="Roboto Mono, monospace" font-size="7">→ replaced by AskUserTool</text>
+
+  <!-- local_tools / io note -->
+  <rect x="602" y="228" width="118" height="36" rx="3" fill="#1e0e00" stroke="#7755aa" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="661" y="243" text-anchor="middle" fill="#bb88ff" font-family="Roboto Mono, monospace" font-size="8">local_tools  (Array)</text>
+  <text x="661" y="255" text-anchor="middle" fill="#9966cc" font-family="Roboto Mono, monospace" font-size="7">input= / output= (io_bridge)</text>
+
+  <!-- Network box -->
+  <rect x="748" y="110" width="128" height="100" rx="5" fill="#200a28" stroke="#cc55dd" stroke-width="1"/>
+  <text x="812" y="128" text-anchor="middle" fill="#ee88ff" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">Network</text>
+  <text x="812" y="143" text-anchor="middle" fill="#bb66dd" font-family="Roboto Mono, monospace" font-size="8">network.run(message:)</text>
+  <text x="812" y="157" text-anchor="middle" fill="#bb66dd" font-family="Roboto Mono, monospace" font-size="8">.last_text_content</text>
+
+  <!-- Pipeline stages -->
+  <rect x="758" y="168" width="108" height="34" rx="3" fill="#180820" stroke="#aa44cc" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="812" y="183" text-anchor="middle" fill="#dd88ff" font-family="Roboto Mono, monospace" font-size="8">Step A → Step B</text>
+  <text x="812" y="196" text-anchor="middle" fill="#9944bb" font-family="Roboto Mono, monospace" font-size="7">→ Step C  (pipeline)</text>
+
+  <!-- LLM note -->
+  <rect x="592" y="290" width="274" height="46" rx="5" fill="#1a1000" stroke="#886622" stroke-width="1"/>
+  <text x="729" y="308" text-anchor="middle" fill="#ddaa44" font-family="Roboto Mono, monospace" font-size="9" font-weight="bold">LLM / External Services</text>
+  <text x="729" y="323" text-anchor="middle" fill="#886633" font-family="Roboto Mono, monospace" font-size="8">ruby_llm, openai, anthropic, etc.  (optional, robot-internal)</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ARROWS
+  ══════════════════════════════════════════════════════════════ -->
+  <defs>
+    <marker id="a1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#6633bb"/>
+    </marker>
+    <marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#3388cc"/>
+    </marker>
+    <marker id="a3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#33aa66"/>
+    </marker>
+    <marker id="a4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#dd8822"/>
+    </marker>
+    <marker id="a5" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#cc44bb"/>
+    </marker>
+    <marker id="a6" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#ccaa00"/>
+    </marker>
+  </defs>
+
+  <!-- Client → simple_a2a  (HTTP POST) -->
+  <line x1="122" y1="127" x2="140" y2="127" stroke="#6633bb" stroke-width="2" marker-end="url(#a1)"/>
+  <text x="131" y="122" text-anchor="middle" fill="#9966cc" font-family="Roboto Mono, monospace" font-size="7">POST</text>
+
+  <!-- simple_a2a → executor.call() -->
+  <line x1="320" y1="185" x2="338" y2="185" stroke="#3388cc" stroke-width="2" marker-end="url(#a2)"/>
+  <text x="329" y="180" text-anchor="middle" fill="#4499bb" font-family="Roboto Mono, monospace" font-size="7">call</text>
+
+  <!-- RobotAdapter → Robot -->
+  <line x1="562" y1="200" x2="580" y2="200" stroke="#33aa66" stroke-width="2" marker-end="url(#a3)"/>
+  <text x="571" y="195" text-anchor="middle" fill="#55cc88" font-family="Roboto Mono, monospace" font-size="7">run</text>
+
+  <!-- NetworkAdapter → Network -->
+  <line x1="562" y1="335" x2="748" y2="165" stroke="#33aa66" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#a3)"/>
+
+  <!-- input_required return arrow (dashed, upward) -->
+  <path d="M 403 264 Q 271 360 271 258" fill="none" stroke="#cc44bb" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#a5)"/>
+  <text x="300" y="320" text-anchor="middle" fill="#cc44bb" font-family="Roboto Mono, monospace" font-size="8">input_required</text>
+
+  <!-- Resume arrow: ResumeContext → answer_queue -->
+  <path d="M 271 212 Q 271 170 403 212" fill="none" stroke="#cc44bb" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#a5)"/>
+  <text x="330" y="168" text-anchor="middle" fill="#cc44bb" font-family="Roboto Mono, monospace" font-size="8">resume</text>
+
+  <!-- Registry ↔ RobotAdapter (dashed) -->
+  <line x1="404" y1="274" x2="404" y2="376" stroke="#ccaa00" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a6)"/>
+  <text x="416" y="332" fill="#998800" font-family="Roboto Mono, monospace" font-size="7">register/</text>
+  <text x="416" y="342" fill="#998800" font-family="Roboto Mono, monospace" font-size="7">fetch</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       LEGEND
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="14" y="540" width="872" height="46" rx="6" fill="#111118" stroke="#333344" stroke-width="1"/>
+  <text x="28" y="556" fill="#888" font-family="Roboto Mono, monospace" font-size="9">Legend:</text>
+
+  <rect x="75"  y="546" width="30" height="10" rx="2" fill="#1a1030" stroke="#6633bb" stroke-width="1"/>
+  <text x="111" y="556" fill="#aaa" font-family="Roboto Mono, monospace" font-size="9">A2A protocol</text>
+
+  <rect x="190" y="546" width="30" height="10" rx="2" fill="#0e1e30" stroke="#3388cc" stroke-width="1"/>
+  <text x="226" y="556" fill="#aaa" font-family="Roboto Mono, monospace" font-size="9">HTTP layer</text>
+
+  <rect x="300" y="546" width="30" height="10" rx="2" fill="#0e1e16" stroke="#33aa66" stroke-width="1"/>
+  <text x="336" y="556" fill="#aaa" font-family="Roboto Mono, monospace" font-size="9">Adapter layer</text>
+
+  <rect x="420" y="546" width="30" height="10" rx="2" fill="#1e1205" stroke="#dd8822" stroke-width="1"/>
+  <text x="456" y="556" fill="#aaa" font-family="Roboto Mono, monospace" font-size="9">Robot layer</text>
+
+  <line x1="535" y1="551" x2="565" y2="551" stroke="#cc44bb" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="572" y="556" fill="#aaa" font-family="Roboto Mono, monospace" font-size="9">interactive flow</text>
+
+  <line x1="665" y1="551" x2="695" y2="551" stroke="#ccaa00" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="702" y="556" fill="#aaa" font-family="Roboto Mono, monospace" font-size="9">Registry lookup</text>
+
+  <!-- second legend row -->
+  <text x="28" y="578" fill="#666" font-family="Roboto Mono, monospace" font-size="8">Dashed borders = injected/optional component   |   Solid borders = always-present component</text>
+</svg>

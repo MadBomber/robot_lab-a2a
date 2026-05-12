@@ -1,39 +1,106 @@
-# RobotLab::A2a
+# robot_lab-a2a
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/robot_lab/a2a`. To experiment with that code, run `bin/console` for an interactive prompt.
+`robot_lab-a2a` exposes RobotLab robots and networks as [Agent2Agent (A2A)](https://google.github.io/A2A/) protocol agents over HTTP and Server-Sent Events. It bridges RobotLab's terminal-based `AskUser` tool to A2A's `input_required`/resume lifecycle, enabling multi-turn conversational flows without any terminal dependency. HTTP serving is delegated to the `simple_a2a` gem.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
-Install the gem and add to the application's Gemfile by executing:
-
 ```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+bundle add robot_lab-a2a
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+Or add to your `Gemfile` manually:
 
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+gem "robot_lab-a2a"
 ```
 
-## Usage
+## Quick Start
 
-TODO: Write usage instructions here
+### Sync robot (no user input)
+
+```ruby
+require "robot_lab/a2a"
+
+robot = MyRobot.new  # any RobotLab::Robot subclass
+
+RobotLab::A2A::Server.new(port: 9292)
+  .add_robot(robot, name: "My Robot", description: "Does something useful")
+  .run
+```
+
+### Interactive robot (multi-turn via AskUserTool)
+
+```ruby
+require "robot_lab/a2a"
+
+robot = MyInteractiveRobot.new
+
+RobotLab::A2A::Server.new(interactive: :a2a_tool, port: 9292)
+  .add_robot(robot, name: "Interactive Robot", description: "Asks clarifying questions")
+  .run
+```
+
+### Network pipeline
+
+```ruby
+require "robot_lab/a2a"
+
+network = MyPipeline.new
+
+RobotLab::A2A::Server.new(port: 9292)
+  .add_network(network, name: "Pipeline", description: "Multi-stage pipeline")
+  .run
+```
+
+## Running the Examples
+
+From the repo root:
+
+```bash
+bundle exec ruby examples/run 01_sync_robot
+bundle exec ruby examples/run 02_interactive_a2a_tool
+bundle exec ruby examples/run 03_robot_network
+```
+
+Or from inside the `examples/` directory:
+
+```bash
+./run 01_sync_robot
+```
+
+Each example starts its own server. Use a second terminal or curl to interact with it. See [docs/examples.md](docs/examples.md) for expected output and two-turn client patterns.
+
+## Documentation
+
+Full documentation lives in [`docs/`](docs/):
+
+- [Overview and architecture](docs/index.md)
+- [Getting started](docs/getting-started.md)
+- [Interactive modes](docs/interactive-modes.md)
+- [Server API reference](docs/server-api.md)
+- [Examples guide](docs/examples.md)
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+```bash
+bin/setup        # install dependencies
+rake test        # run the full test suite
+rake quality     # static analysis (if configured)
+rake build       # build the gem package
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Run a single test file:
 
-## Contributing
+```bash
+ruby -Ilib -Itest test/robot_lab/a2a_test.rb
+```
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/robot_lab-a2a.
+Run a single test by name:
+
+```bash
+ruby -Ilib -Itest test/robot_lab/registry_test.rb -n test_size_is_zero_when_empty
+```
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+MIT
