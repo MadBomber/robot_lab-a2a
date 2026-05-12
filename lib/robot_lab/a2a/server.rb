@@ -30,9 +30,9 @@ module RobotLab
     #     run RobotLab::A2A::Server.new.add_robot(my_robot).to_app
     #   end
     class Server
-      DEFAULT_VERSION = "1.0"
+      DEFAULT_VERSION = '1.0'
 
-      def initialize(host: "localhost", port: 9292, storage: nil, interactive: :none)
+      def initialize(host: 'localhost', port: 9292, storage: nil, interactive: :none)
         @host        = host
         @port        = port
         @storage     = storage || ::A2A::Storage::Memory.new
@@ -68,8 +68,8 @@ module RobotLab
       def add_network(network, name:, description: nil, path: nil)
         if @interactive != :none
           raise ArgumentError,
-                "NetworkAdapter only supports interactive: :none. " \
-                "Wrap individual robots with RobotAdapter for interactive flows."
+                'NetworkAdapter only supports interactive: :none. ' \
+                'Wrap individual robots with RobotAdapter for interactive flows.'
         end
 
         agent_name = name.to_s
@@ -92,8 +92,8 @@ module RobotLab
         url_map = @agents.transform_values do |cfg|
           ::A2A.server(
             agent_card: cfg[:agent_card],
-            executor:   cfg[:executor],
-            storage:    cfg[:storage]
+            executor: cfg[:executor],
+            storage: cfg[:storage]
           ).rack_app
         end
         Rack::URLMap.new(url_map)
@@ -103,15 +103,15 @@ module RobotLab
 
       def build_agent_card(name, description, path:)
         ::A2A::Models::AgentCard.new(
-          name:         name,
-          description:  description,
-          version:      DEFAULT_VERSION,
+          name: name,
+          description: description,
+          version: DEFAULT_VERSION,
           capabilities: ::A2A::Models::AgentCapabilities.new,
-          skills:       [::A2A::Models::AgentSkill.new(name: "chat", description: "General conversation")],
-          interfaces:   [
+          skills: [::A2A::Models::AgentSkill.new(name: 'chat', description: 'General conversation')],
+          interfaces: [
             ::A2A::Models::AgentInterface.new(
-              type:    "A2A",
-              url:     "http://#{@host}:#{@port}#{path}",
+              type: 'A2A',
+              url: "http://#{@host}:#{@port}#{path}",
               version: DEFAULT_VERSION
             )
           ]
@@ -121,7 +121,7 @@ module RobotLab
       # Convert a Ruby-style name to RFC 1123 DNS label format.
       # Underscores become hyphens; characters outside [a-z0-9-] are dropped.
       def dns_label(name)
-        name.to_s.downcase.gsub("_", "-").gsub(/[^a-z0-9-]/, "").gsub(/\A-+|-+\z/, "")
+        name.to_s.downcase.gsub('_', '-').gsub(/[^a-z0-9-]/, '').gsub(/\A-+|-+\z/, '')
       end
     end
   end

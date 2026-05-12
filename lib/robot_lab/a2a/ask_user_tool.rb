@@ -11,15 +11,15 @@ module RobotLab
     #
     # Inject before robot.run() via RobotAdapter — do not use directly.
     class AskUserTool < RobotLab::Tool
-      description "Ask the user a clarifying question and wait for their response"
-      param :question, type: "string", desc: "The question to present to the user"
-      param :choices,  type: "array",  desc: "Optional list of choices to present", required: false
-      param :default,  type: "string", desc: "Default value if user presses Enter",  required: false
+      description 'Ask the user a clarifying question and wait for their response'
+      param :question, type: 'string', desc: 'The question to present to the user'
+      param :choices,  type: 'array',  desc: 'Optional list of choices to present', required: false
+      param :default,  type: 'string', desc: 'Default value if user presses Enter', required: false
 
       attr_writer :event_queue, :answer_queue
 
       def execute(question:, choices: nil, default: nil)
-        raise "A2A queues not injected — use RobotLab::A2A::RobotAdapter" unless @event_queue
+        raise 'A2A queues not injected — use RobotLab::A2A::RobotAdapter' unless @event_queue
 
         prompt_text = format_prompt(question, choices, default)
         prompt      = ::A2A::Models::Message.agent(prompt_text)
@@ -34,9 +34,7 @@ module RobotLab
 
       def format_prompt(question, choices, default)
         lines = [question]
-        if choices.is_a?(Array) && choices.any?
-          choices.each_with_index { |c, i| lines << "  #{i + 1}. #{c}" }
-        end
+        choices.each_with_index { |c, i| lines << "  #{i + 1}. #{c}" } if choices.is_a?(Array) && choices.any?
         lines << "(Default: #{default})" if default
         lines.join("\n")
       end

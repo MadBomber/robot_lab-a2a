@@ -1,0 +1,112 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Run a demo end-to-end: starts the server, waits until it accepts
+# connections, runs the client, then shuts the server down.
+#
+# Usage (from the project root):
+#   bundle exec ruby examples/run 01_sync_robot
+#
+# Usage (from inside examples/):
+#   ./run 01_sync_robot
+
+require 'rubygems'
+require 'socket'
+
+EXAMPLES_DIR    = File.expand_path(__dir__)
+RUBY            = RbConfig.ruby
+BUNDLE          = Gem.bin_path('bundler', 'bundle')
+SERVER_PORT     = 9292
+STARTUP_TIMEOUT = 15 # seconds
+
+# ---------------------------------------------------------------------------
+# Argument handling
+# ---------------------------------------------------------------------------
+name = ARGV.first&.chomp('/')
+
+unless name
+  puts 'Usage: run <demo-name>'
+  puts
+  puts 'Available demos:'
+  Dir["#{EXAMPLES_DIR}/*/server.rb"].each do |f|
+    puts "  #{File.basename(File.dirname(f))}"
+  end
+  exit 1
+end
+
+demo_dir = File.join(EXAMPLES_DIR, name)
+
+abort "Demo not found: #{demo_dir}" unless File.directory?(demo_dir)
+
+# If the demo has its own run script, delegate to it.
+custom_runner = File.join(demo_dir, 'run')
+exec(RUBY, custom_runner, *ARGV.drop(1)) if File.exist?(custom_runner)
+
+server_rb = File.join(demo_dir, 'server.rb')
+client_rb = File.join(demo_dir, 'client.rb')
+
+abort "Missing server.rb in #{demo_dir}" unless File.exist?(server_rb)
+abort "Missing client.rb in #{demo_dir}" unless File.exist?(client_rb)
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+def banner(text)
+  bar = '─' * (text.length + 4)
+  puts "┌#{bar}┐"
+  puts "│  #{text}  │"
+  puts "└#{bar}┘"
+end
+
+def server_ready?(port)
+  TCPSocket.new('localhost', port).close
+  true
+rescue Errno::ECONNREFUSED, Errno::EADDRNOTAVAIL, Errno::ETIMEDOUT
+  false
+end
+
+def wait_for_server(port, timeout)
+  deadline = Time.now + timeout
+  sleep 0.05 until server_ready?(port) || Time.now > deadline
+  server_ready?(port)
+end
+
+# ---------------------------------------------------------------------------
+# Start server
+# ---------------------------------------------------------------------------
+banner "Starting #{name} — server"
+server_pid = spawn(BUNDLE, 'exec', RUBY, server_rb, out: $stdout, err: $stderr)
+
+unless wait_for_server(SERVER_PORT, STARTUP_TIMEOUT)
+  begin
+    Process.kill('TERM', server_pid)
+  rescue StandardError
+    nil
+  end
+  abort "\nServer did not become ready within #{STARTUP_TIMEOUT}s — aborting."
+end
+
+puts "\n(server ready on port #{SERVER_PORT})\n\n"
+
+# ---------------------------------------------------------------------------
+# Run client
+# ---------------------------------------------------------------------------
+banner "Running #{name} — client"
+begin
+  client_ok = system(BUNDLE, 'exec', RUBY, client_rb)
+rescue Interrupt
+  client_ok = false
+end
+
+# ---------------------------------------------------------------------------
+# Shut down server
+# ---------------------------------------------------------------------------
+puts "\n(stopping server…)"
+begin
+  Process.kill('TERM', server_pid)
+  Process.wait(server_pid)
+rescue Errno::ESRCH, Errno::ECHILD
+  # already gone
+end
+
+exit(client_ok ? 0 : 1)

@@ -11,20 +11,23 @@ SimpleCov.start do
   minimum_coverage line: 95, branch: 75
 end
 
-$LOAD_PATH.unshift File.expand_path("support", __dir__)
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+$LOAD_PATH.unshift File.expand_path('support', __dir__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
-require "robot_lab/a2a"
+require 'robot_lab/a2a'
 
 require 'minitest/autorun'
 
-class Minitest::Test
-  def wait_until(timeout: 1, interval: 0.005)
-    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
-    loop do
-      return if yield
-      raise "wait_until timed out after #{timeout}s" if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
-      sleep interval
+module Minitest
+  class Test
+    def wait_until(timeout: 1, interval: 0.005)
+      deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
+      loop do
+        return if yield
+        raise "wait_until timed out after #{timeout}s" if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+
+        sleep interval
+      end
     end
   end
 end

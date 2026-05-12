@@ -9,10 +9,11 @@ module RobotLab
     # release. Wrap individual robots with RobotAdapter for interactive flows.
     class NetworkAdapter < ::A2A::Server::AgentExecutor
       def initialize(network, interactive: :none)
+        super()
         if interactive != :none
           raise ArgumentError,
-                "NetworkAdapter only supports interactive: :none. " \
-                "For interactive network flows, wrap individual robots with RobotAdapter."
+                'NetworkAdapter only supports interactive: :none. ' \
+                'For interactive network flows, wrap individual robots with RobotAdapter.'
         end
 
         @network = network
@@ -27,7 +28,7 @@ module RobotLab
 
         artifact = ::A2A::Models::Artifact.new(
           parts: [::A2A::Models::Part.text(reply.to_s)],
-          name:  "reply"
+          name: 'reply'
         )
         context.task.complete!(artifacts: [artifact])
         context.emit_status(final: true)

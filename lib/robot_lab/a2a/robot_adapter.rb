@@ -20,6 +20,7 @@ module RobotLab
       VALID_MODES = %i[none a2a_tool io_bridge].freeze
 
       def initialize(robot, interactive: :none)
+        super()
         unless VALID_MODES.include?(interactive)
           raise ArgumentError, "interactive must be one of #{VALID_MODES.inspect}"
         end
@@ -61,7 +62,7 @@ module RobotLab
         reply    = @robot.run(input_text).reply
         artifact = ::A2A::Models::Artifact.new(
           parts: [::A2A::Models::Part.text(reply.to_s)],
-          name:  "reply"
+          name: 'reply'
         )
         context.task.complete!(artifacts: [artifact])
         context.emit_status(final: true)
@@ -76,7 +77,7 @@ module RobotLab
             entry.answer_queue.push(context.resume_message.text_content)
             monitor_task(context, entry, task_id)
           else
-            context.task.fail!(message: "No active session found for resumed task")
+            context.task.fail!(message: 'No active session found for resumed task')
             context.emit_status(final: true)
           end
         else
@@ -93,21 +94,19 @@ module RobotLab
         context.emit_status
 
         thread = Thread.new do
-          begin
-            setup_interactive_mode(robot, event_queue, answer_queue)
-            reply = robot.run(input_text).reply
-            event_queue.push({ type: :done, reply: reply })
-          rescue => e
-            event_queue.push({ type: :error, error: e })
-          ensure
-            teardown_interactive_mode(robot)
-            Registry.delete(task_id)
-          end
+          setup_interactive_mode(robot, event_queue, answer_queue)
+          reply = robot.run(input_text).reply
+          event_queue.push({ type: :done, reply: reply })
+        rescue StandardError => e
+          event_queue.push({ type: :error, error: e })
+        ensure
+          teardown_interactive_mode(robot)
+          Registry.delete(task_id)
         end
 
         entry = Registry::Entry.new(
-          thread:       thread,
-          event_queue:  event_queue,
+          thread: thread,
+          event_queue: event_queue,
           answer_queue: answer_queue
         )
         Registry.register(task_id, entry)
@@ -115,7 +114,7 @@ module RobotLab
         monitor_task(context, entry, task_id)
       end
 
-      def monitor_task(context, entry, task_id)
+      def monitor_task(context, entry, _task_id)
         event = entry.event_queue.pop
         case event[:type]
         when :ask
@@ -124,7 +123,7 @@ module RobotLab
         when :done
           artifact = ::A2A::Models::Artifact.new(
             parts: [::A2A::Models::Part.text(event[:reply].to_s)],
-            name:  "reply"
+            name: 'reply'
           )
           context.task.complete!(artifacts: [artifact])
           context.emit_status(final: true)

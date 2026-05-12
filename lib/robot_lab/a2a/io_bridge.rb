@@ -18,14 +18,14 @@ module RobotLab
       def initialize(event_queue:, answer_queue:)
         @event_queue   = event_queue
         @answer_queue  = answer_queue
-        @output_buffer = +""
+        @output_buffer = +''
         @buffer_mutex  = Mutex.new
       end
 
       # --- output side (robot.output) ---
 
       def print(*args)
-        @buffer_mutex.synchronize { @output_buffer << args.map(&:to_s).join }
+        @buffer_mutex.synchronize { @output_buffer << args.join }
         nil
       end
 
@@ -63,7 +63,7 @@ module RobotLab
         end
 
         prompt = ::A2A::Models::Message.agent(
-          prompt_text.empty? ? "Input required:" : prompt_text
+          prompt_text.empty? ? 'Input required:' : prompt_text
         )
         @event_queue.push({ type: :ask, prompt: prompt })
 
