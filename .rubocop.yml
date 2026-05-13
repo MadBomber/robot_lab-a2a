@@ -7,6 +7,9 @@ AllCops:
 Style/Documentation:
   Enabled: false
 
+Layout/ExtraSpacing:
+  Enabled: false
+
 Metrics/MethodLength:
   Max: 25
   CountAsOne:
