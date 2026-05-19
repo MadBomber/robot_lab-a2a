@@ -35,6 +35,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'rack'
-  spec.add_dependency 'robot_lab'
+  spec.add_dependency 'robot_lab', '~> 0.2.0'
   spec.add_dependency 'simple_a2a', '~> 0.3'
 end

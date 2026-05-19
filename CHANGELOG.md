@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-19
+
 ### Added
 
 - Demo examples infrastructure: `examples/run` lifecycle script, shared `examples/common_config.rb`, and three complete demos:
@@ -13,6 +15,7 @@
 ### Changed
 
 - Interactive mode `:acp_tool` renamed to `:a2a_tool` across all source, tests, and documentation
+- Version synchronized with robot_lab core 0.2.1
 
 ### Fixed
 
