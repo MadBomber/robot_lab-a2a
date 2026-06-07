@@ -8,9 +8,11 @@ gemspec
 group :development, :test do
   gem 'aigcm'
   gem 'debug_me'
+  gem 'flay'
   gem 'flog'
   gem 'irb'
   gem 'minitest'
+  gem 'minitest-reporters'
   gem 'rake'
   gem 'rubocop'
 end

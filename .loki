@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+# robot_lab-a2a — Agent2Agent protocol adapter over HTTP+SSE.
+
+import_up "repo_dev.loki"
+
+class Tasks
+  @@gem_name ||= "robot_lab-a2a".freeze
+
+  header "robot_lab-a2a v#{gem_version} — A2A protocol adapter"
+end
