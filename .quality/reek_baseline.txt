@@ -1,0 +1,6 @@
+2	lib/robot_lab/a2a/ask_user_tool.rb
+1	lib/robot_lab/a2a/io_bridge.rb
+2	lib/robot_lab/a2a/network_adapter.rb
+2	lib/robot_lab/a2a/registry.rb
+7	lib/robot_lab/a2a/robot_adapter.rb
+8	lib/robot_lab/a2a/server.rb
