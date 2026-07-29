@@ -5,6 +5,7 @@
 ```
 examples/
   run                     # launcher script
+  common_config.rb        # shared $LOAD_PATH + require, loaded by every example
   01_sync_robot/
     server.rb             # starts the A2A server
     client.rb             # sends a task and prints the result
@@ -13,6 +14,16 @@ examples/
     client.rb
   03_robot_network/
     server.rb
+    client.rb
+  04_io_bridge/
+    server.rb
+    client.rb
+  05_multi_agent/
+    server.rb
+    client.rb
+  06_rack_mount/
+    server.rb
+    config.ru             # standalone Rack/Rails mount reference (not used by run)
     client.rb
 ```
 
@@ -114,3 +125,46 @@ Sending task to network...
 Reply: [synthesised answer from the final pipeline stage]
 Done.
 ```
+
+## 04_io_bridge
+
+**Demonstrates:** `:io_bridge` interactive mode. `QuoteRobot` has no knowledge of A2A at all — it just calls `@output.puts` and `@input.gets` (falling back to `$stdout`/`$stdin` when not injected), so the same class also runs fine interactively in a terminal. The server injects an `IoBridge` as `robot.input`/`robot.output` before each run.
+
+**Two-turn flow:**
+
+1. Client sends a topic (`"stoicism"`) → `QuoteRobot` writes its question to the buffered output, then calls `gets` → `IoBridge` flushes the buffer as the `input_required` prompt and blocks.
+2. Client resumes with the same `task_id` and an answer (`"Ada"`) → `IoBridge` unblocks `gets` → the robot completes and returns a quote addressed to that name.
+
+**What it shows:**
+
+- `interactive: :io_bridge` server setup
+- A robot written against plain Ruby IO, with no A2A-specific code
+- The same two-turn `task_id` resume pattern as `:a2a_tool`
+
+**Note:** Turn 2 requires a `simple_a2a` build with `ResumeContext` support (>= 0.3.1). On older versions the client still demonstrates Turn 1's `input_required` suspension.
+
+## 05_multi_agent
+
+**Demonstrates:** Multiple independent A2A agents served from a single process via the fluent builder API with explicit `path:` overrides — `HeadlineRobot` at `/headline` and `TagRobot` at `/tags`.
+
+**What it shows:**
+
+- Chaining `add_robot` calls with explicit `path:` values on one `Server` instance
+- Two separate `A2A.client` instances, one per agent path, each with its own agent card
+- That co-located agents are indistinguishable from independently hosted ones at the protocol level
+
+**Expected output (client):** both clients discover their agent card, send the same input text, and print each robot's distinct reply (a capitalised headline vs. a list of `#hashtag` keywords) alongside pass/fail assertions.
+
+## 06_rack_mount
+
+**Demonstrates:** `server.to_app`, which returns a `Rack::URLMap` instead of starting a dedicated server — for embedding A2A agents inside a larger Rack application (Rails, Sinatra, Puma, etc.) rather than running `server.run` standalone.
+
+The demo composes the A2A agent (`EchoRobot`, mounted via `to_app`) with a plain `/health` JSON Rack endpoint on the same combined app, run via `A2A::Server::FalconRunner`. `config.ru` in this directory is a copy-paste reference for mounting the same `to_app` result under Rackup or a Rails `config/routes.rb` — it is not used by `examples/run`.
+
+**What it shows:**
+
+- `add_robot(...).to_app` returning a `Rack::URLMap`
+- Composing that map with unrelated Rack routes
+- That both A2A and non-A2A routes work correctly side by side on the composed app
+
+**Expected output (client):** a passing health check against `/health` followed by a normal A2A `send_task` round trip against `/echo-robot`, each reported with a pass/fail assertion.

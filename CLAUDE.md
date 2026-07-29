@@ -33,7 +33,7 @@ All source lives under `lib/robot_lab/a2a/`. The gem uses an adapter pattern —
 
 **RobotAdapter** (`robot_adapter.rb`) — Wraps a `RobotLab::Robot` as an executor. Supports three interactive modes:
 - `:none` — Synchronous, robot runs to completion with no input prompts.
-- `:acp_tool` — Injects `AskUserTool` into the robot's `@local_tools`, converting terminal blocking to Queue signaling. Restores original tools on teardown.
+- `:a2a_tool` — Injects `AskUserTool` into the robot's `@local_tools`, converting terminal blocking to Queue signaling. Restores original tools on teardown.
 - `:io_bridge` — Replaces the robot's I/O streams with an `IoBridge` instance; works with robots that use `puts`/`gets` directly.
 
 **AskUserTool** (`ask_user_tool.rb`) — Drop-in replacement for `RobotLab::AskUser`. On `call`, pushes `{type: :ask, prompt:}` to the event_queue then blocks on answer_queue until the A2A client sends a resume.
