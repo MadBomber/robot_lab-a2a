@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -551,6 +551,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#cancelling-an-in-progress-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cancelling an in-progress task
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -696,6 +707,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#cancelling-an-in-progress-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cancelling an in-progress task
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -829,6 +851,8 @@
 </tbody>
 </table>
 <p>When in doubt, start with <code>:none</code>. Upgrade to <code>:a2a_tool</code> if your robot uses <code>AskUser</code>, or <code>:io_bridge</code> if it uses raw IO.</p>
+<h2 id="cancelling-an-in-progress-task">Cancelling an in-progress task<a class="headerlink" href="#cancelling-an-in-progress-task" title="Permanent link">&para;</a></h2>
+<p>While a robot is suspended waiting on <code>answer_queue</code> (i.e. between an <code>input_required</code> event and the client's resume), the A2A client may send <code>tasks/cancel</code> instead of resuming. <code>RobotAdapter#cancel</code> looks the task up in <code>Registry</code> by task ID, kills the robot thread with <code>Thread#kill</code>, and removes the entry from <code>Registry</code> before delegating to the default <code>AgentExecutor#cancel</code> behaviour. If no entry is found (e.g. the task already completed or was never interactive), <code>cancel</code> is a no-op aside from the default behaviour.</p>
 
 
 
@@ -1006,7 +1030,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "header.autohide", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

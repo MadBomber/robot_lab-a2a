@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -603,6 +603,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#04_io_bridge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        04_io_bridge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#05_multi_agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        05_multi_agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#06_rack_mount" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        06_rack_mount
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -694,6 +727,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#04_io_bridge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        04_io_bridge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#05_multi_agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        05_multi_agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#06_rack_mount" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        06_rack_mount
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -739,15 +805,26 @@
 <h2 id="layout">Layout<a class="headerlink" href="#layout" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>examples/
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  run                     # launcher script
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  01_sync_robot/
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    server.rb             # starts the A2A server
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    client.rb             # sends a task and prints the result
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  02_interactive_a2a_tool/
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    server.rb
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    client.rb
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>  03_robot_network/
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    server.rb
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    client.rb
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  common_config.rb        # shared $LOAD_PATH + require, loaded by every example
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  01_sync_robot/
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    server.rb             # starts the A2A server
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    client.rb             # sends a task and prints the result
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  02_interactive_a2a_tool/
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    server.rb
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    client.rb
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>  03_robot_network/
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    server.rb
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    client.rb
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>  04_io_bridge/
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    server.rb
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    client.rb
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>  05_multi_agent/
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    server.rb
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    client.rb
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>  06_rack_mount/
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    server.rb
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    config.ru             # standalone Rack/Rails mount reference (not used by run)
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    client.rb
 </span></code></pre></div>
 <h2 id="how-to-run">How to run<a class="headerlink" href="#how-to-run" title="Permanent link">&para;</a></h2>
 <p>From the repo root, pass the example directory name to <code>examples/run</code>:</p>
@@ -821,6 +898,39 @@
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>Reply: [synthesised answer from the final pipeline stage]
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>Done.
 </span></code></pre></div>
+<h2 id="04_io_bridge">04_io_bridge<a class="headerlink" href="#04_io_bridge" title="Permanent link">&para;</a></h2>
+<p><strong>Demonstrates:</strong> <code>:io_bridge</code> interactive mode. <code>QuoteRobot</code> has no knowledge of A2A at all — it just calls <code>@output.puts</code> and <code>@input.gets</code> (falling back to <code>$stdout</code>/<code>$stdin</code> when not injected), so the same class also runs fine interactively in a terminal. The server injects an <code>IoBridge</code> as <code>robot.input</code>/<code>robot.output</code> before each run.</p>
+<p><strong>Two-turn flow:</strong></p>
+<ol>
+<li>Client sends a topic (<code>"stoicism"</code>) → <code>QuoteRobot</code> writes its question to the buffered output, then calls <code>gets</code> → <code>IoBridge</code> flushes the buffer as the <code>input_required</code> prompt and blocks.</li>
+<li>Client resumes with the same <code>task_id</code> and an answer (<code>"Ada"</code>) → <code>IoBridge</code> unblocks <code>gets</code> → the robot completes and returns a quote addressed to that name.</li>
+</ol>
+<p><strong>What it shows:</strong></p>
+<ul>
+<li><code>interactive: :io_bridge</code> server setup</li>
+<li>A robot written against plain Ruby IO, with no A2A-specific code</li>
+<li>The same two-turn <code>task_id</code> resume pattern as <code>:a2a_tool</code></li>
+</ul>
+<p><strong>Note:</strong> Turn 2 requires a <code>simple_a2a</code> build with <code>ResumeContext</code> support (&gt;= 0.3.1). On older versions the client still demonstrates Turn 1's <code>input_required</code> suspension.</p>
+<h2 id="05_multi_agent">05_multi_agent<a class="headerlink" href="#05_multi_agent" title="Permanent link">&para;</a></h2>
+<p><strong>Demonstrates:</strong> Multiple independent A2A agents served from a single process via the fluent builder API with explicit <code>path:</code> overrides — <code>HeadlineRobot</code> at <code>/headline</code> and <code>TagRobot</code> at <code>/tags</code>.</p>
+<p><strong>What it shows:</strong></p>
+<ul>
+<li>Chaining <code>add_robot</code> calls with explicit <code>path:</code> values on one <code>Server</code> instance</li>
+<li>Two separate <code>A2A.client</code> instances, one per agent path, each with its own agent card</li>
+<li>That co-located agents are indistinguishable from independently hosted ones at the protocol level</li>
+</ul>
+<p><strong>Expected output (client):</strong> both clients discover their agent card, send the same input text, and print each robot's distinct reply (a capitalised headline vs. a list of <code>#hashtag</code> keywords) alongside pass/fail assertions.</p>
+<h2 id="06_rack_mount">06_rack_mount<a class="headerlink" href="#06_rack_mount" title="Permanent link">&para;</a></h2>
+<p><strong>Demonstrates:</strong> <code>server.to_app</code>, which returns a <code>Rack::URLMap</code> instead of starting a dedicated server — for embedding A2A agents inside a larger Rack application (Rails, Sinatra, Puma, etc.) rather than running <code>server.run</code> standalone.</p>
+<p>The demo composes the A2A agent (<code>EchoRobot</code>, mounted via <code>to_app</code>) with a plain <code>/health</code> JSON Rack endpoint on the same combined app, run via <code>A2A::Server::FalconRunner</code>. <code>config.ru</code> in this directory is a copy-paste reference for mounting the same <code>to_app</code> result under Rackup or a Rails <code>config/routes.rb</code> — it is not used by <code>examples/run</code>.</p>
+<p><strong>What it shows:</strong></p>
+<ul>
+<li><code>add_robot(...).to_app</code> returning a <code>Rack::URLMap</code></li>
+<li>Composing that map with unrelated Rack routes</li>
+<li>That both A2A and non-A2A routes work correctly side by side on the composed app</li>
+</ul>
+<p><strong>Expected output (client):</strong> a passing health check against <code>/health</code> followed by a normal A2A <code>send_task</code> round trip against <code>/echo-robot</code>, each reported with a pass/fail assertion.</p>
 
 
 
@@ -982,7 +1092,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "header.autohide", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
