@@ -102,3 +102,7 @@ RobotLab::A2A::Server.new(interactive: :io_bridge)
 | `:io_bridge` | `robot.run(text)` + settable `robot.input=` / `robot.output=` | Robots that interact via raw stdin/stdout streams |
 
 When in doubt, start with `:none`. Upgrade to `:a2a_tool` if your robot uses `AskUser`, or `:io_bridge` if it uses raw IO.
+
+## Cancelling an in-progress task
+
+While a robot is suspended waiting on `answer_queue` (i.e. between an `input_required` event and the client's resume), the A2A client may send `tasks/cancel` instead of resuming. `RobotAdapter#cancel` looks the task up in `Registry` by task ID, kills the robot thread with `Thread#kill`, and removes the entry from `Registry` before delegating to the default `AgentExecutor#cancel` behaviour. If no entry is found (e.g. the task already completed or was never interactive), `cancel` is a no-op aside from the default behaviour.

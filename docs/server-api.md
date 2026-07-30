@@ -27,8 +27,8 @@ Valid `interactive` values: `:none`, `:a2a_tool`, `:io_bridge`. See [Interactive
 ```ruby
 server.add_robot(
   robot,
-  name:        required,   # String — human-readable agent name
-  description: required,   # String — agent capability description
+  name:        nil,        # String — human-readable agent name; defaults to robot.name
+  description: nil,        # String — agent capability description; defaults to robot.description
   path:        nil         # String — URL path segment; derived from name if nil
 ) → self
 ```
@@ -51,12 +51,12 @@ Wraps `robot` in a `RobotAdapter` using the server's `interactive` setting and r
 server.add_network(
   network,
   name:        required,   # String — human-readable agent name
-  description: required,   # String — agent capability description
+  description: nil,        # String — agent capability description; defaults to name
   path:        nil         # String — URL path segment; derived from name if nil
 ) → self
 ```
 
-Wraps `network` in a `NetworkAdapter`. Only `:none` mode is supported for networks; the `interactive` setting is ignored.
+Wraps `network` in a `NetworkAdapter`, always constructed with `interactive: :none`. If the server's own `interactive` setting is anything other than `:none`, `add_network` raises `ArgumentError` instead of silently ignoring it — networks do not support interactive modes. Wrap individual robots with `RobotAdapter` (via `add_robot`) for interactive flows.
 
 **`network` must respond to:**
 
