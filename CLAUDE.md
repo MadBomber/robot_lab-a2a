@@ -10,8 +10,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 rake test              # Run full test suite (default rake task)
-rake build             # Build the gem package
-rake install           # Install gem locally
+asgard build           # Build the gem package
+asgard install         # Install gem locally
 
 bin/setup              # Install dependencies
 bin/console            # IRB session with gem loaded
