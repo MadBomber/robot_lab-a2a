@@ -56,19 +56,22 @@ module RobotLab
       # --- input side (robot.input) ---
 
       def gets
-        prompt_text = @buffer_mutex.synchronize do
-          text = @output_buffer.dup.strip
-          @output_buffer.clear
-          text
-        end
-
-        prompt = ::A2A::Models::Message.agent(
-          prompt_text.empty? ? 'Input required:' : prompt_text
-        )
-        @event_queue.push({ type: :ask, prompt: prompt })
+        prompt = ::A2A::Models::Message.agent(drain_prompt_text)
+        @event_queue.push({ type: :ask, prompt: })
 
         answer = @answer_queue.pop
         "#{answer}\n"
+      end
+
+      private
+
+      # Atomically empty the output buffer and return its text as the prompt.
+      def drain_prompt_text
+        @buffer_mutex.synchronize do
+          text = @output_buffer.dup.strip
+          @output_buffer.clear
+          text.empty? ? 'Input required:' : text
+        end
       end
     end
   end

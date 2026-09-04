@@ -29,9 +29,13 @@ module RobotLab
     #   map "/agents" do
     #     run RobotLab::A2A::Server.new.add_robot(my_robot).to_app
     #   end
+    #
+    # :reek:DataClump -- name/description/path is the agent-card identity trio;
+    # add_robot and add_network resolve caller overrides, build_agent_card consumes.
     class Server
       DEFAULT_VERSION = '1.0'
 
+      # :reek:ControlParameter -- nil storage means "default to in-process Memory".
       def initialize(host: 'localhost', port: 9292, storage: nil, interactive: :none)
         @host        = host
         @port        = port
@@ -47,6 +51,8 @@ module RobotLab
       # @param description [String, nil] overrides robot.description
       # @param path [String, nil] URL path prefix (defaults to "/dns-label")
       # @return [self] for chaining
+      # :reek:ControlParameter -- nil name/description/path mean "derive from
+      # the robot"; each `||` is a default, not a behavior switch.
       def add_robot(robot, name: nil, description: nil, path: nil)
         agent_name = (name || robot.name).to_s
         agent_desc = description || robot.description || agent_name
@@ -65,6 +71,8 @@ module RobotLab
       # @param description [String, nil]
       # @param path [String, nil] URL path prefix (defaults to "/dns-label")
       # @return [self] for chaining
+      # :reek:ControlParameter -- nil description/path mean "derive from name";
+      # each `||` is a default, not a behavior switch.
       def add_network(network, name:, description: nil, path: nil)
         if @interactive != :none
           raise ArgumentError,
@@ -88,6 +96,8 @@ module RobotLab
       end
 
       # Return a Rack app for embedding in other servers (e.g. Rails, Puma).
+      # :reek:FeatureEnvy -- maps each registered agent config into its
+      # simple_a2a rack app; the config hashes are this class's own @agents values.
       def to_app
         url_map = @agents.transform_values do |cfg|
           ::A2A.server(

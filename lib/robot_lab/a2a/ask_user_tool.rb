@@ -18,6 +18,12 @@ module RobotLab
 
       attr_writer :event_queue, :answer_queue
 
+      def initialize(robot: nil)
+        super
+        @event_queue  = nil
+        @answer_queue = nil
+      end
+
       def execute(question:, choices: nil, default: nil)
         raise 'A2A queues not injected — use RobotLab::A2A::RobotAdapter' unless @event_queue
 

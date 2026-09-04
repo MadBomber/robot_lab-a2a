@@ -8,6 +8,8 @@ module RobotLab
     # per-robot queue injection across all network robots, planned for a future
     # release. Wrap individual robots with RobotAdapter for interactive flows.
     class NetworkAdapter < ::A2A::Server::AgentExecutor
+      # :reek:ControlParameter -- interactive is only validated here; anything
+      # but :none is rejected with a pointer to RobotAdapter.
       def initialize(network, interactive: :none)
         super()
         if interactive != :none
@@ -19,6 +21,8 @@ module RobotLab
         @network = network
       end
 
+      # :reek:FeatureEnvy -- AgentExecutor protocol method: it drives the task
+      # lifecycle (start/complete/emit) on the request context handed to it.
       def call(context)
         context.task.start!
         context.emit_status
