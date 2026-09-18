@@ -12,9 +12,9 @@ module RobotLab
     # Inject before robot.run() via RobotAdapter — do not use directly.
     class AskUserTool < RobotLab::Tool
       description 'Ask the user a clarifying question and wait for their response'
-      param :question, type: 'string', desc: 'The question to present to the user'
-      param :choices,  type: 'array',  desc: 'Optional list of choices to present', required: false
-      param :default,  type: 'string', desc: 'Default value if user presses Enter', required: false
+      parameter :question, type: 'string', description: 'The question to present to the user'
+      parameter :choices,  type: 'array',  description: 'Optional list of choices to present', required: false
+      parameter :default,  type: 'string', description: 'Default value if user presses Enter', required: false
 
       attr_writer :event_queue, :answer_queue
 
