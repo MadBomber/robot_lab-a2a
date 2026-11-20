@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'stringio'
 
 # ── Shared doubles ────────────────────────────────────────────────────────────
 
@@ -136,6 +137,19 @@ module AdapterTestHelpers
     end
   end
 
+  # Robot whose #run takes a tools: keyword, like RobotLab::Robot#run
+  class MockToolsKeywordRobot
+    attr_reader :received_tools
+
+    def name        = 'tools_keyword_robot'
+    def description = 'records the tools: keyword'
+
+    def run(input, tools: :none)
+      @received_tools = tools
+      MockResult.new("reply to: #{input}")
+    end
+  end
+
   # ── Network doubles ───────────────────────────────────────────────────────
 
   class MockNetworkResult
@@ -144,6 +158,14 @@ module AdapterTestHelpers
 
   class MockNetwork
     def run(**) = MockNetworkResult.new
+  end
+
+  # Mirrors RobotLab::Network#run, which returns a SimpleFlow::Result whose
+  # #value is the last robot's result.
+  MockPipelineResult = Struct.new(:value)
+
+  class MockWrappedNetwork
+    def run(**) = MockPipelineResult.new(MockNetworkResult.new)
   end
 end
 
@@ -190,6 +212,32 @@ module RobotLab
 
         assert_equal 2, ctx.emissions.size
         assert ctx.emissions.last[:final]
+      end
+
+      def test_call_none_requests_inherited_tools_when_run_accepts_tools
+        robot   = MockToolsKeywordRobot.new
+        adapter = RobotLab::A2A::RobotAdapter.new(robot, interactive: :none)
+        ctx     = MockContext.new(task: MockTask.new('none-3'), message: MockMessage.new('hi'))
+
+        adapter.call(ctx)
+
+        assert_equal :inherit, robot.received_tools
+      end
+
+      def test_accepts_tools_keyword_only_when_run_declares_it
+        adapter = RobotLab::A2A::RobotAdapter.new(MockRobot.new, interactive: :none)
+
+        assert adapter.send(:accepts_tools_keyword?, MockToolsKeywordRobot.new)
+        refute adapter.send(:accepts_tools_keyword?, MockRobot.new)
+      end
+
+      def test_failure_message_wraps_text_in_an_agent_message
+        adapter = RobotLab::A2A::RobotAdapter.new(MockRobot.new, interactive: :none)
+        message = adapter.send(:failure_message, 'boom')
+
+        assert_instance_of ::A2A::Models::Message, message
+        assert_predicate message, :agent?
+        assert_equal 'boom', message.text_content
       end
 
       def test_cancel_kills_registered_thread
@@ -259,9 +307,43 @@ module RobotLab
         ctx     = MockContext.new(task: task, message: MockMessage.new('hello'))
 
         adapter.call(ctx)
-        wait_until { robot.instance_variable_get(:@_a2a_injected_tool).nil? }
+        wait_until { RobotLab::A2A::Registry.fetch('a2a-done-2').nil? }
 
         assert_empty(robot.local_tools.grep(RobotLab::A2A::AskUserTool))
+      end
+
+      def test_done_path_puts_back_displaced_ask_user
+        robot    = MockInteractiveRobot.new
+        ask_user = RobotLab::AskUser.new
+        other    = Object.new
+        robot.local_tools.push(ask_user, other)
+        adapter = RobotLab::A2A::RobotAdapter.new(robot, interactive: :a2a_tool)
+        ctx     = MockContext.new(task: MockTask.new('a2a-done-3'), message: MockMessage.new('hello'))
+
+        adapter.call(ctx)
+        wait_until { RobotLab::A2A::Registry.fetch('a2a-done-3').nil? }
+
+        assert_equal [ask_user, other], robot.local_tools
+      end
+
+      def test_inject_ask_user_tool_swaps_ask_user_and_returns_original
+        robot    = MockInteractiveRobot.new
+        ask_user = RobotLab::AskUser.new
+        robot.local_tools.push(ask_user)
+        adapter = RobotLab::A2A::RobotAdapter.new(robot, interactive: :a2a_tool)
+
+        original = adapter.send(:inject_ask_user_tool, robot, Queue.new, Queue.new)
+
+        assert_equal [ask_user], original
+        assert_equal [RobotLab::A2A::AskUserTool], robot.local_tools.map(&:class)
+      end
+
+      def test_teardown_is_a_no_op_when_setup_saved_nothing
+        robot   = MockInteractiveRobot.new
+        adapter = RobotLab::A2A::RobotAdapter.new(robot, interactive: :a2a_tool)
+
+        assert_nil adapter.send(:teardown_interactive_mode, robot, nil)
+        assert_empty robot.local_tools
       end
 
       # --- :ask path ---
@@ -324,7 +406,8 @@ module RobotLab
         adapter.call(ctx)
 
         assert_equal :failed, task.state
-        assert_match 'No active session', task.last_message
+        assert_instance_of ::A2A::Models::Message, task.last_message
+        assert_match 'No active session', task.last_message.text_content
         assert ctx.emissions.last[:final]
       end
 
@@ -339,7 +422,8 @@ module RobotLab
         adapter.call(ctx)
 
         assert_equal :failed, task.state
-        assert_match 'simulated robot error', task.last_message
+        assert_instance_of ::A2A::Models::Message, task.last_message
+        assert_match 'simulated robot error', task.last_message.text_content
         assert ctx.emissions.last[:final]
       end
 
@@ -396,6 +480,29 @@ module RobotLab
 
         assert_nil robot.input
         assert_nil robot.output
+      end
+
+      def test_done_path_restores_previous_io
+        robot        = MockIoBridgeRobot.new
+        input        = StringIO.new
+        output       = StringIO.new
+        robot.input  = input
+        robot.output = output
+        adapter = RobotLab::A2A::RobotAdapter.new(robot, interactive: :io_bridge)
+        ctx     = MockContext.new(task: MockTask.new('io-done-3'), message: MockMessage.new('hello'))
+
+        adapter.call(ctx)
+        wait_until { RobotLab::A2A::Registry.fetch('io-done-3').nil? }
+
+        assert_same input,  robot.input
+        assert_same output, robot.output
+      end
+
+      def test_current_io_is_nil_for_robots_without_readers
+        adapter     = RobotLab::A2A::RobotAdapter.new(MockRobot.new, interactive: :io_bridge)
+        writer_only = Class.new { attr_writer :input, :output }.new
+
+        assert_nil adapter.send(:current_io, writer_only, :input)
       end
 
       # --- :ask path ---
@@ -465,6 +572,26 @@ module RobotLab
 
         assert_equal :completed, task.state
         refute_empty task.artifacts
+      end
+
+      def test_call_unwraps_pipeline_result_value
+        adapter = RobotLab::A2A::NetworkAdapter.new(MockWrappedNetwork.new, interactive: :none)
+        task    = MockTask.new('net-3')
+        ctx     = MockContext.new(task: task, message: MockMessage.new('process this'))
+
+        adapter.call(ctx)
+
+        assert_equal :completed, task.state
+        assert_equal 'network reply', task.artifacts.first.parts.first.text
+      end
+
+      def test_extract_reply_handles_each_result_shape
+        adapter = RobotLab::A2A::NetworkAdapter.new(MockNetwork.new)
+
+        assert_equal 'network reply', adapter.send(:extract_reply, MockNetworkResult.new)
+        assert_equal 'network reply', adapter.send(:extract_reply, MockPipelineResult.new(MockNetworkResult.new))
+        assert_equal 'plain text',    adapter.send(:extract_reply, MockPipelineResult.new('plain text'))
+        assert_equal 'bare',          adapter.send(:extract_reply, 'bare')
       end
 
       def test_call_emits_status_twice

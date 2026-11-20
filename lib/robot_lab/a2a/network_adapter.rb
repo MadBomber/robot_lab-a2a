@@ -28,7 +28,7 @@ module RobotLab
         context.emit_status
 
         input_text = context.message.text_content
-        reply      = @network.run(message: input_text).last_text_content
+        reply      = extract_reply(@network.run(message: input_text))
 
         artifact = ::A2A::Models::Artifact.new(
           parts: [::A2A::Models::Part.text(reply.to_s)],
@@ -36,6 +36,18 @@ module RobotLab
         )
         context.task.complete!(artifacts: [artifact])
         context.emit_status(final: true)
+      end
+
+      private
+
+      # A real RobotLab::Network#run returns a SimpleFlow::Result whose #value
+      # is the last robot's RobotResult; duck-typed networks may return an
+      # object that answers #last_text_content directly.
+      # :reek:UtilityFunction -- pure result unwrapping, kept on the adapter
+      # so it can be tested in isolation.
+      def extract_reply(result)
+        result = result.value if !result.respond_to?(:last_text_content) && result.respond_to?(:value)
+        result.respond_to?(:last_text_content) ? result.last_text_content : result
       end
     end
   end

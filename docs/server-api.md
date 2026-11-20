@@ -18,9 +18,9 @@ RobotLab::A2A::Server.new(
 | `host` | `String` | `"localhost"` | Passed through to `simple_a2a` / Falcon |
 | `port` | `Integer` | `9292` | TCP port to listen on |
 | `storage` | Object / nil | `nil` | Pluggable task persistence; defaults to an in-memory store |
-| `interactive` | `Symbol` | `:none` | Applies to all adapters unless overridden per-registration |
+| `interactive` | `Symbol` | `:none` | Applies to every robot registered on this server; there is no per-registration override |
 
-Valid `interactive` values: `:none`, `:a2a_tool`, `:io_bridge`. See [Interactive Modes](interactive-modes.md) for details.
+Valid `interactive` values: `:none`, `:a2a_tool`, `:io_bridge`. The value is validated when `add_robot` is called (any other value raises `ArgumentError` there, not in `Server.new`). See [Interactive Modes](interactive-modes.md) for details.
 
 ## `add_robot`
 
@@ -28,7 +28,7 @@ Valid `interactive` values: `:none`, `:a2a_tool`, `:io_bridge`. See [Interactive
 server.add_robot(
   robot,
   name:        nil,        # String — human-readable agent name; defaults to robot.name
-  description: nil,        # String — agent capability description; defaults to robot.description
+  description: nil,        # String — agent capability description; defaults to robot.description, then the name
   path:        nil         # String — URL path segment; derived from name if nil
 ) → self
 ```
@@ -60,13 +60,13 @@ Wraps `network` in a `NetworkAdapter`, always constructed with `interactive: :no
 
 **`network` must respond to:**
 
-- `network.run(message: text)` → object responding to `.last_text_content`
+- `network.run(message: text)` → either an object responding to `.last_text_content`, or (as a real `RobotLab::Network` returns) a result whose `.value` responds to it
 
 **Path defaulting:** Same DNS label conversion as `add_robot`.
 
 ## `add_robot` — optional keyword details
 
-`name:` and `description:` default to `robot.name` and `robot.description` when omitted. `path:` always defaults to the DNS label of the name used.
+`name:` and `description:` default to `robot.name` and `robot.description` when omitted (if `robot.description` is `nil`, the name is used as the description). `path:` always defaults to the DNS label of the name used.
 
 ## `run`
 
@@ -105,7 +105,7 @@ run Rack::URLMap.new(
 Agent names are converted to RFC 1123-compatible path segments:
 
 1. Convert to lowercase.
-2. Replace underscores with hyphens.
+2. Replace underscores, and each run of whitespace, with a hyphen.
 3. Drop any character that is not an ASCII letter, digit, or hyphen.
 4. Strip leading/trailing hyphens.
 

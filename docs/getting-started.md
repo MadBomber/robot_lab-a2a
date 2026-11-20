@@ -31,7 +31,7 @@ If you are working directly in this repo or have a local checkout of `robot_lab-
 gem "robot_lab-a2a", path: "../robot_lab-a2a"
 ```
 
-The gem also depends on `simple_a2a`. For interactive resume support (`input_required`/resume lifecycle), you need a build of `simple_a2a` that includes `ResumeContext`. If your local copy is newer than the released gem, use a path dependency for that too:
+The gem also depends on `simple_a2a`. For interactive resume support (`input_required`/resume lifecycle), you need a build of `simple_a2a` that includes `ResumeContext` (the bundled examples name `simple_a2a` >= 0.3.1). If your local copy is newer than the released gem, use a path dependency for that too:
 
 ```ruby
 gem "simple_a2a", path: "../simple_a2a"
@@ -54,7 +54,7 @@ class GreeterRobot < RobotLab::Robot
     )
   end
 
-  # robot_lab calls run(text) and expects a result with a .reply method
+  # robot_lab-a2a calls run(text) and expects a result with a .reply method
 end
 ```
 
@@ -67,34 +67,37 @@ require_relative "my_robot"
 
 robot = GreeterRobot.new
 
-RobotLab::A2A::Server.new
+RobotLab::A2A::Server.new(port: 7000)
   .add_robot(robot, name: "Greeter", description: "Returns a greeting")
-  .run(port: 7000)
+  .run
 ```
 
 ```bash
 bundle exec ruby server.rb
-# => Listening on http://0.0.0.0:7000
+# serves http://localhost:7000 until interrupted (the server prints nothing on startup)
 ```
 
 ### 3. Send a task
 
 The server exposes each robot at its DNS-label path. `GreeterRobot` registered as `"Greeter"` becomes `/greeter`.
 
+Requests are JSON-RPC 2.0 POSTs to that path; the A2A method name goes in the body:
+
 ```bash
-curl -X POST http://localhost:7000/greeter/tasks/send \
+curl -X POST http://localhost:7000/greeter \
   -H "Content-Type: application/json" \
-  -d '{"message": {"role": "user", "parts": [{"text": "Hello!"}]}}'
+  -d '{"jsonrpc": "2.0", "id": "1", "method": "tasks/send",
+       "params": {"message": {"role": "user", "parts": [{"text": "Hello!"}]}}}'
 ```
 
-The response is a stream of SSE events ending with a `task_complete` event whose payload contains the robot's reply.
+`tasks/send` returns a single JSON-RPC response whose `result` is the task: `result.status.state` is `"completed"` and the robot's reply is the text part of `result.artifacts[0]` (the artifact is named `"reply"`). To receive SSE status events instead, use the `tasks/sendSubscribe` method with the same `params`.
 
 ### 4. Inspect the agent card
 
-Every registered agent exposes its capabilities at `/.well-known/agent.json` (via `simple_a2a`):
+Every registered agent exposes its agent card at `agentCard` under its path (via `simple_a2a`):
 
 ```bash
-curl http://localhost:7000/greeter/.well-known/agent.json
+curl http://localhost:7000/greeter/agentCard
 ```
 
 ## What's next

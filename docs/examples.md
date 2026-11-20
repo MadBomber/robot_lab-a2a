@@ -42,9 +42,9 @@ cd examples
 ./run 01_sync_robot
 ```
 
-The launcher starts `server.rb` in the background, waits for it to bind, then runs `client.rb` in the foreground so you see the output. Press Ctrl-C to stop.
+The launcher starts `server.rb` in the background, waits for it to accept connections on port 9292, runs `client.rb` in the foreground so you see the output, then stops the server when the client exits.
 
-To run server and client separately (useful for inspecting raw SSE output):
+To run server and client separately (useful for sending your own requests to the server):
 
 ```bash
 # Terminal 1
@@ -60,70 +60,128 @@ bundle exec ruby examples/01_sync_robot/client.rb
 
 **What it shows:**
 
-- `Server.new.add_robot(...).run(port:)` pattern
-- A single `tasks/send` POST
-- Parsing the SSE stream to extract `task_complete` payload
+- `Server.new(host:, port:)` + `add_robot(...)` + `run` pattern
+- `A2A.client(url:)` discovering the agent card, then `send_task` (a `tasks/send` call) for each of three messages
+- Reading the reply from the completed task's first artifact, then `list_tasks` and `get_task`
 
 **Expected output (client):**
 
 ```
-Sending task...
-[event: task_started]
-[event: task_complete]
-Reply: The answer is 42.
-Done.
+=== Agent Card ===
+Name:        echo_robot
+Description: Transforms every message: upcases it and reports character count
+Skills:      chat
+
+=== Sending Tasks ===
+[completed]
+  sent: "hello from robot_lab-a2a"
+  got:  "HELLO FROM ROBOT_LAB-A2A  [24 chars, processed by EchoRobot]"
+
+...two more tasks...
+
+=== Task List ===
+  <task-id>  state=completed
+  <task-id>  state=completed
+  <task-id>  state=completed
+  Total: 3
+
+=== Retrieve Task ===
+id:    <task-id>
+state: completed
+reply: "HELLO FROM ROBOT_LAB-A2A  [24 chars, processed by EchoRobot]"
+
+=== Verification ===
+All tasks completed. PASS
 ```
 
 ## 02_interactive_a2a_tool
 
-**Demonstrates:** A robot that calls `RobotLab::AskUser` during execution. The gem injects `AskUserTool`, converts the blocking call to an A2A `input_required` event, and the client resumes with the answer.
+**Demonstrates:** A robot (`PersonalGreeterRobot`, a plain Ruby object) that calls the injected `AskUserTool` during execution. The gem injects `AskUserTool` into the robot's `local_tools`, converts the blocking call to an A2A `input_required` task, and the client resumes with the answer.
 
 **Two-turn flow:**
 
-1. Client sends initial task → server starts robot thread → robot calls `AskUser("What is your name?")` → SSE delivers `input_required` event with prompt and task ID.
-2. Client sends a second `tasks/send` with the task ID and the user's answer → `AskUserTool` unblocks → robot continues → SSE delivers `task_complete`.
+1. Client sends initial task → server starts robot thread → robot calls `AskUserTool#execute(question: "What is your name?", choices: [...], default: "Friend")` → `send_task` returns the task in state `input_required`, with the formatted prompt as its status message.
+2. Client calls `send_task` again with `task_id:` set to that task's ID and the user's answer → `AskUserTool` unblocks → robot continues → the same task comes back in state `completed`.
 
 **What it shows:**
 
 - `interactive: :a2a_tool` server setup
-- How to extract `task_id` and `input_required` prompt from the first SSE stream
-- How to construct the resume request with `task_id`
+- How to read the task ID (`task.id`) and the prompt (`task.status.message`) from the first response
+- How to construct the resume request with `task_id:`
 
 **Expected output (client):**
 
 ```
-Turn 1 — sending initial task...
-[event: task_started]
-[event: input_required] prompt: "What is your name?"
-task_id: abc-123-def
+=== Agent Card ===
+Name:        personal_greeter
+Description: Asks your name before composing a personalised greeting
 
-Turn 2 — resuming with answer...
-[event: task_started]
-[event: task_complete]
-Reply: Hello, Alice! Nice to meet you.
-Done.
+=== Turn 1: Initial request ===
+  Sending topic: 'the A2A protocol'
+
+  Task ID: <task-id>
+  State:   input_required
+  Question: What is your name?
+  1. Alice
+  2. Bob
+  3. Charlie
+(Default: Friend)
+
+=== Turn 2: Answer ===
+  Answering: 'Alice'
+
+  Task ID: <task-id>
+  State:   completed
+  Reply:   Hello, Alice! You wanted to know about: the A2A protocol
+
+=== Verification ===
+Turn 1 returned input_required   : PASS
+Prompt contains numbered choices : PASS
+Prompt shows default value       : PASS
+Turn 2 completed after answer    : PASS
+Reply mentions the caller name   : PASS
+
+All assertions passed.
 ```
+
+(Divider lines between sections are omitted here.)
 
 ## 03_robot_network
 
-**Demonstrates:** A `RobotLab::Network` (multi-stage pipeline) exposed as a single A2A agent via `NetworkAdapter` in `:none` mode.
+**Demonstrates:** A network-style pipeline (`EditorialPipeline`, a plain Ruby object implementing the `run(message:)` → `#last_text_content` interface that `NetworkAdapter` accepts alongside real `RobotLab::Network` objects) exposed as a single A2A agent via `NetworkAdapter` in `:none` mode.
 
-**Pipeline stages:** The example network typically chains two or three robots — for example, a research robot that gathers context, followed by a synthesis robot that produces a final answer. Each stage's output feeds the next.
+**Pipeline stages:** The example chains three robots — `AnalyserRobot` (prefixes a word count), `FormatterRobot` (capitalises each word), and `SummaryRobot` (prefixes `SUMMARY →`). Each stage's output feeds the next.
 
 **What it shows:**
 
 - `add_network` registration
 - That the caller sees only one A2A endpoint regardless of how many internal stages the network has
-- `network.run(message: text).last_text_content` as the final reply
+- The network's last text content (`network.run(message: text)`) as the final reply
 
 **Expected output (client):**
 
 ```
-Sending task to network...
-[event: task_started]
-[event: task_complete]
-Reply: [synthesised answer from the final pipeline stage]
-Done.
+=== Agent Card ===
+Name:        editorial_pipeline
+Description: Three-stage text pipeline: analyse → format → summarise
+Skills:      chat
+
+=== Pipeline Results ===
+Input:  "the quick brown fox jumps over the lazy dog"
+Output: "SUMMARY → [Analysed: 9 Words] The Quick Brown Fox Jumps Over The Lazy Dog"
+State:  completed
+
+...two more documents...
+
+=== Verification ===
+completed  : PASS
+analysed   : PASS
+formatted  : PASS
+summarised : PASS
+
+...repeated for each document...
+
+All pipeline checks passed.
 ```
 
 ## 04_io_bridge
