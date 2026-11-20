@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Ruby >= 3.2
+- Ruby >= 4.0.9
 - The `robot_lab` gem (provides `RobotLab::Robot` and `RobotLab::Network`)
 - Bundler
 
