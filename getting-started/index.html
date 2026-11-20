@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -33,10 +33,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -874,14 +874,14 @@
 <h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Ruby &gt;= 3.2</li>
+<li>Ruby &gt;= 4.0.9</li>
 <li>The <code>robot_lab</code> gem (provides <code>RobotLab::Robot</code> and <code>RobotLab::Network</code>)</li>
 <li>Bundler</li>
 </ul>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
 <h3 id="as-a-gem-dependency">As a gem dependency<a class="headerlink" href="#as-a-gem-dependency" title="Permanent link">&para;</a></h3>
 <p>Add to your <code>Gemfile</code>:</p>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;robot_lab-a2a&quot;</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">gem</span><span class="w"> </span><span class="s2">"robot_lab-a2a"</span>
 </span></code></pre></div>
 <p>Then run:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bundle<span class="w"> </span>install
@@ -889,22 +889,22 @@
 <h3 id="as-a-local-path-dependency-for-development">As a local path dependency (for development)<a class="headerlink" href="#as-a-local-path-dependency-for-development" title="Permanent link">&para;</a></h3>
 <p>If you are working directly in this repo or have a local checkout of <code>robot_lab-a2a</code>:</p>
 <div class="language-ruby highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Gemfile</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;robot_lab-a2a&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">path</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../robot_lab-a2a&quot;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">gem</span><span class="w"> </span><span class="s2">"robot_lab-a2a"</span><span class="p">,</span><span class="w"> </span><span class="ss">path</span><span class="p">:</span><span class="w"> </span><span class="s2">"../robot_lab-a2a"</span>
 </span></code></pre></div>
 <p>The gem also depends on <code>simple_a2a</code>. For interactive resume support (<code>input_required</code>/resume lifecycle), you need a build of <code>simple_a2a</code> that includes <code>ResumeContext</code>. If your local copy is newer than the released gem, use a path dependency for that too:</p>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">gem</span><span class="w"> </span><span class="s2">&quot;simple_a2a&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">path</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../simple_a2a&quot;</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">gem</span><span class="w"> </span><span class="s2">"simple_a2a"</span><span class="p">,</span><span class="w"> </span><span class="ss">path</span><span class="p">:</span><span class="w"> </span><span class="s2">"../simple_a2a"</span>
 </span></code></pre></div>
 <h2 id="sync-robot-5-minutes">Sync Robot (5 minutes)<a class="headerlink" href="#sync-robot-5-minutes" title="Permanent link">&para;</a></h2>
 <h3 id="1-define-your-robot">1. Define your robot<a class="headerlink" href="#1-define-your-robot" title="Permanent link">&para;</a></h3>
 <div class="language-ruby highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># my_robot.rb</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">require</span><span class="w"> </span><span class="s2">&quot;robot_lab&quot;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">require</span><span class="w"> </span><span class="s2">"robot_lab"</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">GreeterRobot</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="no">RobotLab</span><span class="o">::</span><span class="no">Robot</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="k">def</span><span class="w"> </span><span class="nf">initialize</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="k">super</span><span class="p">(</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">      </span><span class="nb">name</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Greeter&quot;</span><span class="p">,</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">      </span><span class="ss">description</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Returns a greeting for any input&quot;</span><span class="p">,</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">      </span><span class="ss">model</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gpt-4o-mini&quot;</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">      </span><span class="nb">name</span><span class="p">:</span><span class="w"> </span><span class="s2">"Greeter"</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">      </span><span class="ss">description</span><span class="p">:</span><span class="w"> </span><span class="s2">"Returns a greeting for any input"</span><span class="p">,</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">      </span><span class="ss">model</span><span class="p">:</span><span class="w"> </span><span class="s2">"gpt-4o-mini"</span>
 </span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="p">)</span>
 </span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="k">end</span>
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
@@ -913,13 +913,13 @@
 </span></code></pre></div>
 <h3 id="2-start-the-server">2. Start the server<a class="headerlink" href="#2-start-the-server" title="Permanent link">&para;</a></h3>
 <div class="language-ruby highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># server.rb</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">require</span><span class="w"> </span><span class="s2">&quot;robot_lab/a2a&quot;</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">require_relative</span><span class="w"> </span><span class="s2">&quot;my_robot&quot;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">require</span><span class="w"> </span><span class="s2">"robot_lab/a2a"</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">require_relative</span><span class="w"> </span><span class="s2">"my_robot"</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">GreeterRobot</span><span class="o">.</span><span class="n">new</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="o">.</span><span class="n">add_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="nb">name</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Greeter&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">description</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Returns a greeting&quot;</span><span class="p">)</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="o">.</span><span class="n">add_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="nb">name</span><span class="p">:</span><span class="w"> </span><span class="s2">"Greeter"</span><span class="p">,</span><span class="w"> </span><span class="ss">description</span><span class="p">:</span><span class="w"> </span><span class="s2">"Returns a greeting"</span><span class="p">)</span>
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">port</span><span class="p">:</span><span class="w"> </span><span class="mi">7000</span><span class="p">)</span>
 </span></code></pre></div>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bundle<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>ruby<span class="w"> </span>server.rb
@@ -928,8 +928,8 @@
 <h3 id="3-send-a-task">3. Send a task<a class="headerlink" href="#3-send-a-task" title="Permanent link">&para;</a></h3>
 <p>The server exposes each robot at its DNS-label path. <code>GreeterRobot</code> registered as <code>"Greeter"</code> becomes <code>/greeter</code>.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:7000/greeter/tasks/send<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;message&quot;: {&quot;role&quot;: &quot;user&quot;, &quot;parts&quot;: [{&quot;text&quot;: &quot;Hello!&quot;}]}}&#39;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"message": {"role": "user", "parts": [{"text": "Hello!"}]}}'</span>
 </span></code></pre></div>
 <p>The response is a stream of SSE events ending with a <code>task_complete</code> event whose payload contains the robot's reply.</p>
 <h3 id="4-inspect-the-agent-card">4. Inspect the agent card<a class="headerlink" href="#4-inspect-the-agent-card" title="Permanent link">&para;</a></h3>
@@ -1115,10 +1115,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "header.autohide", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "header.autohide", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

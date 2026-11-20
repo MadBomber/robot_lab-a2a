@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -33,10 +33,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -785,7 +785,7 @@
 <p><code>RobotLab::A2A::Server</code> is a fluent builder. Every mutating method returns <code>self</code> so calls can be chained.</p>
 <h2 id="constructor">Constructor<a class="headerlink" href="#constructor" title="Permanent link">&para;</a></h2>
 <div class="language-ruby highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="ss">host</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1"># String  — bind address</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="ss">host</span><span class="p">:</span><span class="w">        </span><span class="s2">"localhost"</span><span class="p">,</span><span class="w">  </span><span class="c1"># String  — bind address</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="ss">port</span><span class="p">:</span><span class="w">        </span><span class="mi">9292</span><span class="p">,</span><span class="w">         </span><span class="c1"># Integer — TCP port</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="ss">storage</span><span class="p">:</span><span class="w">     </span><span class="kp">nil</span><span class="p">,</span><span class="w">          </span><span class="c1"># Object  — task storage backend (simple_a2a compatible); nil uses in-memory default</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="ss">interactive</span><span class="p">:</span><span class="w"> </span><span class="ss">:none</span><span class="w">         </span><span class="c1"># Symbol  — default interactive mode for all registered adapters</span>
@@ -871,16 +871,16 @@
 </span></code></pre></div>
 <p>Returns a <code>Rack::URLMap</code> instead of starting a server. Use this to embed <code>robot_lab-a2a</code> inside an existing Rack application such as Rails or Puma.</p>
 <p>Example <code>config.ru</code>:</p>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">require</span><span class="w"> </span><span class="s2">&quot;robot_lab/a2a&quot;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">require_relative</span><span class="w"> </span><span class="s2">&quot;my_robot&quot;</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">require</span><span class="w"> </span><span class="s2">"robot_lab/a2a"</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">require_relative</span><span class="w"> </span><span class="s2">"my_robot"</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">MyRobot</span><span class="o">.</span><span class="n">new</span>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">a2a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="o">.</span><span class="n">add_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="nb">name</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Assistant&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">description</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;General assistant&quot;</span><span class="p">)</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="o">.</span><span class="n">add_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="nb">name</span><span class="p">:</span><span class="w"> </span><span class="s2">"Assistant"</span><span class="p">,</span><span class="w"> </span><span class="ss">description</span><span class="p">:</span><span class="w"> </span><span class="s2">"General assistant"</span><span class="p">)</span>
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
 </span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">run</span><span class="w"> </span><span class="no">Rack</span><span class="o">::</span><span class="no">URLMap</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="s2">&quot;/&quot;</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="no">MyRailsApp</span><span class="p">,</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="s2">&quot;/a2a&quot;</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">a2a</span><span class="o">.</span><span class="n">to_app</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="s2">"/"</span><span class="w">     </span><span class="o">=&gt;</span><span class="w"> </span><span class="no">MyRailsApp</span><span class="p">,</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="s2">"/a2a"</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">a2a</span><span class="o">.</span><span class="n">to_app</span>
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="dns-label-conversion-rule">DNS label conversion rule<a class="headerlink" href="#dns-label-conversion-rule" title="Permanent link">&para;</a></h2>
@@ -1088,10 +1088,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "header.autohide", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "search.share", "header.autohide", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>
