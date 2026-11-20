@@ -79,6 +79,16 @@ module RobotLab
         assert_same server, server.add_robot(robot)
       end
 
+      def test_dns_label_hyphenates_whitespace
+        server = new_server
+
+        assert_equal 'my-robot',        server.send(:dns_label, 'My Robot')
+        assert_equal 'gpt-4-agent',     server.send(:dns_label, 'GPT-4 Agent!')
+        assert_equal 'a-b',             server.send(:dns_label, "a \t b")
+        assert_equal 'order-processor', server.send(:dns_label, 'order_processor')
+        assert_equal 'trimmed',         server.send(:dns_label, '  trimmed  ')
+      end
+
       # --- to_app ---
 
       def test_to_app_returns_rack_url_map

@@ -21,8 +21,11 @@
 #
 # To use a real LLM robot instead:
 #   require "robot_lab"
-#   robot = RobotLab.build(name: "greeter", system_prompt: "You are a friendly greeter...")
-#   # Add RobotLab::AskUser to the robot's tools so the LLM can call it.
+#   robot = RobotLab.build(
+#     name: "greeter",
+#     system_prompt: "You are a friendly greeter...",
+#     local_tools: [RobotLab::AskUser]   # swapped for AskUserTool while the robot runs under A2A
+#   )
 #   server = RobotLab::A2A::Server.new(interactive: :a2a_tool)
 #   server.add_robot(robot)
 

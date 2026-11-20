@@ -66,7 +66,7 @@ module RobotLab
         context.task.start!
         context.emit_status
 
-        reply    = @robot.run(input_text).reply
+        reply    = run_robot(@robot, input_text).reply
         artifact = ::A2A::Models::Artifact.new(
           parts: [::A2A::Models::Part.text(reply.to_s)],
           name: 'reply'
@@ -86,7 +86,7 @@ module RobotLab
             entry.answer_queue.push(context.resume_message.text_content)
             monitor_task(context, entry, task_id)
           else
-            context.task.fail!(message: 'No active session found for resumed task')
+            fail_task(context.task, 'No active session found for resumed task')
             context.emit_status(final: true)
           end
         else
@@ -105,13 +105,8 @@ module RobotLab
         context.emit_status
 
         thread = Thread.new do
-          setup_interactive_mode(robot, event_queue, answer_queue)
-          reply = robot.run(input_text).reply
-          event_queue.push({ type: :done, reply: reply })
-        rescue StandardError => e
-          event_queue.push({ type: :error, error: e })
+          interactive_run(robot, input_text, event_queue, answer_queue)
         ensure
-          teardown_interactive_mode(robot)
           Registry.delete(task_id)
         end
 
@@ -125,6 +120,19 @@ module RobotLab
         monitor_task(context, entry, task_id)
       end
 
+      # Body of the robot thread: set up the mode, run the robot, report the
+      # outcome on event_queue, and always put the robot back as it was.
+      def interactive_run(robot, input_text, event_queue, answer_queue)
+        saved = setup_interactive_mode(robot, event_queue, answer_queue)
+        reply = run_robot(robot, input_text).reply
+        event_queue.push({ type: :done, reply: reply })
+      rescue StandardError => e
+        event_queue.push({ type: :error, error: e })
+      ensure
+        teardown_interactive_mode(robot, saved)
+      end
+
+      # :reek:FeatureEnvy -- translates one robot-thread event into a task transition.
       def monitor_task(context, entry, _task_id)
         event = entry.event_queue.pop
         task  = context.task
@@ -138,13 +146,42 @@ module RobotLab
           )
           task.complete!(artifacts: [artifact])
         when :error
-          task.fail!(message: event[:error].message)
+          fail_task(task, event[:error].message)
         end
         context.emit_status(final: true)
       end
 
+      def fail_task(task, text)
+        task.fail!(message: failure_message(text))
+      end
+
+      # TaskStatus#message is an A2A Message, so failure text is wrapped in one.
+      # :reek:UtilityFunction -- pure text-to-Message conversion.
+      def failure_message(text)
+        ::A2A::Models::Message.agent(text.to_s)
+      end
+
+      # ── running the robot ─────────────────────────────────────
+
+      # RobotLab::Robot#run defaults to tools: :none, which sends the model no
+      # tools at all. Ask for the robot's attached tools so the injected
+      # AskUserTool (or core AskUser under :io_bridge) is actually offered.
+      # Duck-typed robots whose #run takes only the input are called as before.
+      # :reek:FeatureEnvy -- dispatches on the robot's #run signature; the robot is the subject.
+      def run_robot(robot, input_text)
+        accepts_tools_keyword?(robot) ? robot.run(input_text, tools: :inherit) : robot.run(input_text)
+      end
+
+      # :reek:UtilityFunction -- pure signature inspection of the robot's #run.
+      def accepts_tools_keyword?(robot)
+        robot.method(:run).parameters.any? do |type, name|
+          type == :keyrest || (%i[key keyreq].include?(type) && name == :tools)
+        end
+      end
+
       # ── interactive setup / teardown ──────────────────────────
 
+      # Returns the robot state it displaced, for teardown_interactive_mode.
       def setup_interactive_mode(robot, event_queue, answer_queue)
         case @interactive
         when :a2a_tool  then inject_ask_user_tool(robot, event_queue, answer_queue)
@@ -152,41 +189,56 @@ module RobotLab
         end
       end
 
-      def teardown_interactive_mode(robot)
+      # saved is nil when setup raised before anything was displaced.
+      def teardown_interactive_mode(robot, saved)
+        return unless saved
+
         case @interactive
-        when :a2a_tool
-          restore_tools(robot)
-        when :io_bridge
-          robot.input  = nil
-          robot.output = nil
+        when :a2a_tool  then restore_tools(robot, saved)
+        when :io_bridge then restore_io(robot, saved)
         end
       end
 
+      # Swaps any AskUser / AskUserTool for a queue-backed AskUserTool.
+      # @return [Array] the robot's local_tools as they were before injection
       def inject_ask_user_tool(robot, event_queue, answer_queue)
         tool = AskUserTool.new(robot: robot)
         tool.event_queue  = event_queue
         tool.answer_queue = answer_queue
 
-        without_ask_user = robot.local_tools.reject do |t|
+        original         = robot.local_tools
+        without_ask_user = original.reject do |t|
           t.is_a?(RobotLab::AskUser) || t.is_a?(AskUserTool)
         end
         robot.instance_variable_set(:@local_tools, without_ask_user + [tool])
-        robot.instance_variable_set(:@_a2a_injected_tool, tool)
+        original
       end
 
-      def restore_tools(robot)
-        injected = robot.instance_variable_get(:@_a2a_injected_tool)
-        return unless injected
-
-        cleaned = robot.local_tools.reject { |t| t.equal?(injected) }
-        robot.instance_variable_set(:@local_tools, cleaned)
-        robot.remove_instance_variable(:@_a2a_injected_tool)
+      # :reek:UtilityFunction -- puts back the tool list inject_ask_user_tool returned.
+      def restore_tools(robot, original)
+        robot.instance_variable_set(:@local_tools, original)
       end
 
+      # @return [Hash] the robot's previous :input and :output streams
       def inject_io_bridge(robot, event_queue, answer_queue)
+        saved  = { input: current_io(robot, :input), output: current_io(robot, :output) }
         bridge = IoBridge.new(event_queue: event_queue, answer_queue: answer_queue)
         robot.input  = bridge
         robot.output = bridge
+        saved
+      end
+
+      # :reek:UtilityFunction -- puts back the streams inject_io_bridge returned.
+      def restore_io(robot, saved)
+        robot.input  = saved[:input]
+        robot.output = saved[:output]
+      end
+
+      # Robots need only expose input=/output=; a missing reader means "unset".
+      # :reek:UtilityFunction -- pure optional-reader lookup.
+      # :reek:ManualDispatch -- the reader is optional on duck-typed robots.
+      def current_io(robot, stream)
+        robot.respond_to?(stream) ? robot.public_send(stream) : nil
       end
     end
   end

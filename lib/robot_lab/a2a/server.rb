@@ -129,9 +129,10 @@ module RobotLab
       end
 
       # Convert a Ruby-style name to RFC 1123 DNS label format.
-      # Underscores become hyphens; characters outside [a-z0-9-] are dropped.
+      # Underscores and runs of whitespace become hyphens; other characters
+      # outside [a-z0-9-] are dropped.
       def dns_label(name)
-        name.to_s.downcase.gsub('_', '-').gsub(/[^a-z0-9-]/, '').gsub(/\A-+|-+\z/, '')
+        name.to_s.downcase.gsub('_', '-').gsub(/\s+/, '-').gsub(/[^a-z0-9-]/, '').gsub(/\A-+|-+\z/, '')
       end
     end
   end

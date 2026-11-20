@@ -1,5 +1,19 @@
 ## [Unreleased]
 
+### Fixed
+
+- **`NetworkAdapter` now works with a real `RobotLab::Network`.** `Network#run` returns a `SimpleFlow::Result`, so the reply is read from `result.value.last_text_content`; duck-typed networks whose result answers `last_text_content` directly still work. Previously every real network task failed with `NoMethodError`.
+- **Robot tools are offered to the model.** `RobotAdapter` calls `robot.run(text, tools: :inherit)` when the robot's `run` accepts a `tools:` keyword. Core `Robot#run` defaults to `tools: :none`, so the injected `AskUserTool` (`:a2a_tool`) and core `AskUser` (`:io_bridge`) were never sent to the model. Applies in `:none` mode too.
+- **Interactive teardown restores the robot.** `:a2a_tool` puts back the robot's original `local_tools` (a displaced `RobotLab::AskUser` used to be lost after the first run); `:io_bridge` restores the previous `input`/`output` instead of setting them to `nil`.
+- **Failed tasks carry an A2A `Message`.** `task.fail!` was given a bare `String`, which serialised into a `status.message` that clients could not parse as a message.
+- **Path labels hyphenate whitespace.** `"My Robot"` now maps to `/my-robot` (was `/myrobot`) and `"GPT-4 Agent!"` to `/gpt-4-agent`, as documented. Agents registered under a name containing spaces and no explicit `path:` move to the hyphenated path.
+- `mkdocs.yml` no longer references the non-existent `assets/css/custom.css`.
+- Example comments: the real-network snippet in `03_robot_network` uses `task` (not `step`), and the real-LLM snippet in `02_interactive_a2a_tool` attaches `RobotLab::AskUser` via `local_tools:`.
+
+### Added
+
+- `test/real/real_robot_lab_suite.rb`, run in a child process by `test/robot_lab/real_robot_lab_test.rb`, exercises the adapters against the real `robot_lab` gem (the main suite uses a stub) with the model call stubbed out.
+
 ## [0.6.1] - 2026-11-19
 
 ### Changed

@@ -68,7 +68,7 @@ Or from inside the `examples/` directory:
 ./run 01_sync_robot
 ```
 
-Each example starts its own server. Use a second terminal or curl to interact with it. See [docs/examples.md](docs/examples.md) for expected output and two-turn client patterns.
+The launcher starts the example's `server.rb` on port 9292, runs its `client.rb` against it, then stops the server. See [docs/examples.md](docs/examples.md) for expected output and two-turn client patterns.
 
 ## Documentation
 
@@ -89,7 +89,7 @@ asgard quality   # static analysis quality gates
 asgard build     # build the gem package
 ```
 
-Run a single test file:
+Run a single test file (the tests run, but the process exits non-zero because the SimpleCov coverage gate in `test/test_helper.rb` applies to partial runs too):
 
 ```bash
 ruby -Ilib -Itest test/robot_lab/a2a_test.rb

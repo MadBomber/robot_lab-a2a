@@ -13,8 +13,8 @@
 # To use a real RobotLab::Network:
 #   require "robot_lab"
 #   network = RobotLab.create_network(name: "pipeline") do
-#     step :analyst, analyst_robot, depends_on: :none
-#     step :writer,  writer_robot,  depends_on: [:analyst]
+#     task :analyst, analyst_robot, depends_on: :none
+#     task :writer,  writer_robot,  depends_on: [:analyst]
 #   end
 #   server = RobotLab::A2A::Server.new
 #   server.add_network(network, name: "pipeline")
