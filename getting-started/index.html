@@ -55,8 +55,6 @@
       
     
     
-      <link rel="stylesheet" href="../assets/css/custom.css">
-    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -891,7 +889,7 @@
 <div class="language-ruby highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Gemfile</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">gem</span><span class="w"> </span><span class="s2">"robot_lab-a2a"</span><span class="p">,</span><span class="w"> </span><span class="ss">path</span><span class="p">:</span><span class="w"> </span><span class="s2">"../robot_lab-a2a"</span>
 </span></code></pre></div>
-<p>The gem also depends on <code>simple_a2a</code>. For interactive resume support (<code>input_required</code>/resume lifecycle), you need a build of <code>simple_a2a</code> that includes <code>ResumeContext</code>. If your local copy is newer than the released gem, use a path dependency for that too:</p>
+<p>The gem also depends on <code>simple_a2a</code>. For interactive resume support (<code>input_required</code>/resume lifecycle), you need a build of <code>simple_a2a</code> that includes <code>ResumeContext</code> (the bundled examples name <code>simple_a2a</code> &gt;= 0.3.1). If your local copy is newer than the released gem, use a path dependency for that too:</p>
 <div class="language-ruby highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">gem</span><span class="w"> </span><span class="s2">"simple_a2a"</span><span class="p">,</span><span class="w"> </span><span class="ss">path</span><span class="p">:</span><span class="w"> </span><span class="s2">"../simple_a2a"</span>
 </span></code></pre></div>
 <h2 id="sync-robot-5-minutes">Sync Robot (5 minutes)<a class="headerlink" href="#sync-robot-5-minutes" title="Permanent link">&para;</a></h2>
@@ -908,7 +906,7 @@
 </span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="p">)</span>
 </span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="k">end</span>
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">  </span><span class="c1"># robot_lab calls run(text) and expects a result with a .reply method</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">  </span><span class="c1"># robot_lab-a2a calls run(text) and expects a result with a .reply method</span>
 </span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="k">end</span>
 </span></code></pre></div>
 <h3 id="2-start-the-server">2. Start the server<a class="headerlink" href="#2-start-the-server" title="Permanent link">&para;</a></h3>
@@ -918,23 +916,25 @@
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">robot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">GreeterRobot</span><span class="o">.</span><span class="n">new</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">port</span><span class="p">:</span><span class="w"> </span><span class="mi">7000</span><span class="p">)</span>
 </span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="o">.</span><span class="n">add_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="nb">name</span><span class="p">:</span><span class="w"> </span><span class="s2">"Greeter"</span><span class="p">,</span><span class="w"> </span><span class="ss">description</span><span class="p">:</span><span class="w"> </span><span class="s2">"Returns a greeting"</span><span class="p">)</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">port</span><span class="p">:</span><span class="w"> </span><span class="mi">7000</span><span class="p">)</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="o">.</span><span class="n">run</span>
 </span></code></pre></div>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bundle<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>ruby<span class="w"> </span>server.rb
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># =&gt; Listening on http://0.0.0.0:7000</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># serves http://localhost:7000 until interrupted (the server prints nothing on startup)</span>
 </span></code></pre></div>
 <h3 id="3-send-a-task">3. Send a task<a class="headerlink" href="#3-send-a-task" title="Permanent link">&para;</a></h3>
 <p>The server exposes each robot at its DNS-label path. <code>GreeterRobot</code> registered as <code>"Greeter"</code> becomes <code>/greeter</code>.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:7000/greeter/tasks/send<span class="w"> </span><span class="se">\</span>
+<p>Requests are JSON-RPC 2.0 POSTs to that path; the A2A method name goes in the body:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:7000/greeter<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"message": {"role": "user", "parts": [{"text": "Hello!"}]}}'</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"jsonrpc": "2.0", "id": "1", "method": "tasks/send",</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="s1">       "params": {"message": {"role": "user", "parts": [{"text": "Hello!"}]}}}'</span>
 </span></code></pre></div>
-<p>The response is a stream of SSE events ending with a <code>task_complete</code> event whose payload contains the robot's reply.</p>
+<p><code>tasks/send</code> returns a single JSON-RPC response whose <code>result</code> is the task: <code>result.status.state</code> is <code>"completed"</code> and the robot's reply is the text part of <code>result.artifacts[0]</code> (the artifact is named <code>"reply"</code>). To receive SSE status events instead, use the <code>tasks/sendSubscribe</code> method with the same <code>params</code>.</p>
 <h3 id="4-inspect-the-agent-card">4. Inspect the agent card<a class="headerlink" href="#4-inspect-the-agent-card" title="Permanent link">&para;</a></h3>
-<p>Every registered agent exposes its capabilities at <code>/.well-known/agent.json</code> (via <code>simple_a2a</code>):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl<span class="w"> </span>http://localhost:7000/greeter/.well-known/agent.json
+<p>Every registered agent exposes its agent card at <code>agentCard</code> under its path (via <code>simple_a2a</code>):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl<span class="w"> </span>http://localhost:7000/greeter/agentCard
 </span></code></pre></div>
 <h2 id="whats-next">What's next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
 <ul>

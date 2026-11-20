@@ -53,8 +53,6 @@
       
     
     
-      <link rel="stylesheet" href="../assets/css/custom.css">
-    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -834,8 +832,8 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>examples
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>./run<span class="w"> </span>01_sync_robot
 </span></code></pre></div>
-<p>The launcher starts <code>server.rb</code> in the background, waits for it to bind, then runs <code>client.rb</code> in the foreground so you see the output. Press Ctrl-C to stop.</p>
-<p>To run server and client separately (useful for inspecting raw SSE output):</p>
+<p>The launcher starts <code>server.rb</code> in the background, waits for it to accept connections on port 9292, runs <code>client.rb</code> in the foreground so you see the output, then stops the server when the client exits.</p>
+<p>To run server and client separately (useful for sending your own requests to the server):</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Terminal 1</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>bundle<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>ruby<span class="w"> </span>examples/01_sync_robot/server.rb
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
@@ -846,57 +844,114 @@
 <p><strong>Demonstrates:</strong> The simplest possible integration. A robot with no user prompts is registered in <code>:none</code> mode and invoked with a single text message.</p>
 <p><strong>What it shows:</strong></p>
 <ul>
-<li><code>Server.new.add_robot(...).run(port:)</code> pattern</li>
-<li>A single <code>tasks/send</code> POST</li>
-<li>Parsing the SSE stream to extract <code>task_complete</code> payload</li>
+<li><code>Server.new(host:, port:)</code> + <code>add_robot(...)</code> + <code>run</code> pattern</li>
+<li><code>A2A.client(url:)</code> discovering the agent card, then <code>send_task</code> (a <code>tasks/send</code> call) for each of three messages</li>
+<li>Reading the reply from the completed task's first artifact, then <code>list_tasks</code> and <code>get_task</code></li>
 </ul>
 <p><strong>Expected output (client):</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Sending task...
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>[event: task_started]
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>[event: task_complete]
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>Reply: The answer is 42.
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>Done.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>=== Agent Card ===
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Name:        echo_robot
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Description: Transforms every message: upcases it and reports character count
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>Skills:      chat
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>=== Sending Tasks ===
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>[completed]
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>  sent: "hello from robot_lab-a2a"
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>  got:  "HELLO FROM ROBOT_LAB-A2A  [24 chars, processed by EchoRobot]"
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>...two more tasks...
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>=== Task List ===
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>  &lt;task-id&gt;  state=completed
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>  &lt;task-id&gt;  state=completed
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>  &lt;task-id&gt;  state=completed
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>  Total: 3
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>=== Retrieve Task ===
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>id:    &lt;task-id&gt;
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>state: completed
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>reply: "HELLO FROM ROBOT_LAB-A2A  [24 chars, processed by EchoRobot]"
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>=== Verification ===
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>All tasks completed. PASS
 </span></code></pre></div>
 <h2 id="02_interactive_a2a_tool">02_interactive_a2a_tool<a class="headerlink" href="#02_interactive_a2a_tool" title="Permanent link">&para;</a></h2>
-<p><strong>Demonstrates:</strong> A robot that calls <code>RobotLab::AskUser</code> during execution. The gem injects <code>AskUserTool</code>, converts the blocking call to an A2A <code>input_required</code> event, and the client resumes with the answer.</p>
+<p><strong>Demonstrates:</strong> A robot (<code>PersonalGreeterRobot</code>, a plain Ruby object) that calls the injected <code>AskUserTool</code> during execution. The gem injects <code>AskUserTool</code> into the robot's <code>local_tools</code>, converts the blocking call to an A2A <code>input_required</code> task, and the client resumes with the answer.</p>
 <p><strong>Two-turn flow:</strong></p>
 <ol>
-<li>Client sends initial task → server starts robot thread → robot calls <code>AskUser("What is your name?")</code> → SSE delivers <code>input_required</code> event with prompt and task ID.</li>
-<li>Client sends a second <code>tasks/send</code> with the task ID and the user's answer → <code>AskUserTool</code> unblocks → robot continues → SSE delivers <code>task_complete</code>.</li>
+<li>Client sends initial task → server starts robot thread → robot calls <code>AskUserTool#execute(question: "What is your name?", choices: [...], default: "Friend")</code> → <code>send_task</code> returns the task in state <code>input_required</code>, with the formatted prompt as its status message.</li>
+<li>Client calls <code>send_task</code> again with <code>task_id:</code> set to that task's ID and the user's answer → <code>AskUserTool</code> unblocks → robot continues → the same task comes back in state <code>completed</code>.</li>
 </ol>
 <p><strong>What it shows:</strong></p>
 <ul>
 <li><code>interactive: :a2a_tool</code> server setup</li>
-<li>How to extract <code>task_id</code> and <code>input_required</code> prompt from the first SSE stream</li>
-<li>How to construct the resume request with <code>task_id</code></li>
+<li>How to read the task ID (<code>task.id</code>) and the prompt (<code>task.status.message</code>) from the first response</li>
+<li>How to construct the resume request with <code>task_id:</code></li>
 </ul>
 <p><strong>Expected output (client):</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Turn 1 — sending initial task...
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>[event: task_started]
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>[event: input_required] prompt: "What is your name?"
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>task_id: abc-123-def
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>Turn 2 — resuming with answer...
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>[event: task_started]
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>[event: task_complete]
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>Reply: Hello, Alice! Nice to meet you.
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>Done.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>=== Agent Card ===
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>Name:        personal_greeter
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Description: Asks your name before composing a personalised greeting
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>=== Turn 1: Initial request ===
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>  Sending topic: 'the A2A protocol'
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>  Task ID: &lt;task-id&gt;
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>  State:   input_required
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>  Question: What is your name?
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>  1. Alice
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>  2. Bob
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>  3. Charlie
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>(Default: Friend)
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>=== Turn 2: Answer ===
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>  Answering: 'Alice'
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>  Task ID: &lt;task-id&gt;
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>  State:   completed
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>  Reply:   Hello, Alice! You wanted to know about: the A2A protocol
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>=== Verification ===
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>Turn 1 returned input_required   : PASS
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>Prompt contains numbered choices : PASS
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>Prompt shows default value       : PASS
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>Turn 2 completed after answer    : PASS
+</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>Reply mentions the caller name   : PASS
+</span><span id="__span-5-29"><a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>
+</span><span id="__span-5-30"><a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>All assertions passed.
 </span></code></pre></div>
+<p>(Divider lines between sections are omitted here.)</p>
 <h2 id="03_robot_network">03_robot_network<a class="headerlink" href="#03_robot_network" title="Permanent link">&para;</a></h2>
-<p><strong>Demonstrates:</strong> A <code>RobotLab::Network</code> (multi-stage pipeline) exposed as a single A2A agent via <code>NetworkAdapter</code> in <code>:none</code> mode.</p>
-<p><strong>Pipeline stages:</strong> The example network typically chains two or three robots — for example, a research robot that gathers context, followed by a synthesis robot that produces a final answer. Each stage's output feeds the next.</p>
+<p><strong>Demonstrates:</strong> A network-style pipeline (<code>EditorialPipeline</code>, a plain Ruby object implementing the <code>run(message:)</code> → <code>#last_text_content</code> interface that <code>NetworkAdapter</code> accepts alongside real <code>RobotLab::Network</code> objects) exposed as a single A2A agent via <code>NetworkAdapter</code> in <code>:none</code> mode.</p>
+<p><strong>Pipeline stages:</strong> The example chains three robots — <code>AnalyserRobot</code> (prefixes a word count), <code>FormatterRobot</code> (capitalises each word), and <code>SummaryRobot</code> (prefixes <code>SUMMARY →</code>). Each stage's output feeds the next.</p>
 <p><strong>What it shows:</strong></p>
 <ul>
 <li><code>add_network</code> registration</li>
 <li>That the caller sees only one A2A endpoint regardless of how many internal stages the network has</li>
-<li><code>network.run(message: text).last_text_content</code> as the final reply</li>
+<li>The network's last text content (<code>network.run(message: text)</code>) as the final reply</li>
 </ul>
 <p><strong>Expected output (client):</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Sending task to network...
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>[event: task_started]
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>[event: task_complete]
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>Reply: [synthesised answer from the final pipeline stage]
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>Done.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>=== Agent Card ===
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>Name:        editorial_pipeline
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>Description: Three-stage text pipeline: analyse → format → summarise
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>Skills:      chat
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>=== Pipeline Results ===
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>Input:  "the quick brown fox jumps over the lazy dog"
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>Output: "SUMMARY → [Analysed: 9 Words] The Quick Brown Fox Jumps Over The Lazy Dog"
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>State:  completed
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>...two more documents...
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>=== Verification ===
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>completed  : PASS
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>analysed   : PASS
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>formatted  : PASS
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>summarised : PASS
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>...repeated for each document...
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>All pipeline checks passed.
 </span></code></pre></div>
 <h2 id="04_io_bridge">04_io_bridge<a class="headerlink" href="#04_io_bridge" title="Permanent link">&para;</a></h2>
 <p><strong>Demonstrates:</strong> <code>:io_bridge</code> interactive mode. <code>QuoteRobot</code> has no knowledge of A2A at all — it just calls <code>@output.puts</code> and <code>@input.gets</code> (falling back to <code>$stdout</code>/<code>$stdin</code> when not injected), so the same class also runs fine interactively in a terminal. The server injects an <code>IoBridge</code> as <code>robot.input</code>/<code>robot.output</code> before each run.</p>

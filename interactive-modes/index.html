@@ -55,8 +55,6 @@
       
     
     
-      <link rel="stylesheet" href="../assets/css/custom.css">
-    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -762,60 +760,62 @@
 <h1 id="interactive-modes">Interactive Modes<a class="headerlink" href="#interactive-modes" title="Permanent link">&para;</a></h1>
 <h2 id="why-interactive-matters">Why interactive matters<a class="headerlink" href="#why-interactive-matters" title="Permanent link">&para;</a></h2>
 <p>RobotLab's <code>AskUser</code> tool blocks the robot thread and reads from a terminal. That works fine for CLI scripts but breaks completely in an HTTP server: there is no terminal, and the HTTP request has already returned by the time the robot needs an answer.</p>
-<p><code>robot_lab-a2a</code> solves this by converting blocking terminal prompts into A2A <code>input_required</code> events. The robot thread pauses on a Ruby <code>Queue</code>. The HTTP layer serialises the prompt as an SSE event to the A2A client. When the client sends a resume request, the answer is placed onto the queue and the robot thread continues — all without any terminal.</p>
+<p><code>robot_lab-a2a</code> solves this by converting blocking terminal prompts into A2A <code>input_required</code> events. The robot thread pauses on a Ruby <code>Queue</code>. The HTTP layer returns the prompt to the A2A client as the status message of an <code>input_required</code> task. When the client sends a resume request, the answer is placed onto the queue and the robot thread continues — all without any terminal.</p>
 <p>Three modes are available. Choose based on how your robot is implemented.</p>
 <h2 id="none-mode"><code>:none</code> mode<a class="headerlink" href="#none-mode" title="Permanent link">&para;</a></h2>
 <p>The default. The robot receives the initial text message, runs to completion, and returns a single reply. No user interaction occurs during execution.</p>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span><span class="w">                        </span><span class="c1"># interactive: :none is the default</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">port</span><span class="p">:</span><span class="w"> </span><span class="mi">7000</span><span class="p">)</span><span class="w">            </span><span class="c1"># interactive: :none is the default</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="o">.</span><span class="n">add_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="nb">name</span><span class="p">:</span><span class="w"> </span><span class="s2">"Summariser"</span><span class="p">,</span><span class="w"> </span><span class="ss">description</span><span class="p">:</span><span class="w"> </span><span class="s2">"Summarises text"</span><span class="p">)</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">port</span><span class="p">:</span><span class="w"> </span><span class="mi">7000</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="o">.</span><span class="n">run</span>
 </span></code></pre></div>
-<p><strong>Robot interface required:</strong> <code>robot.run(text)</code> returns a result responding to <code>.reply</code>.</p>
+<p><strong>Robot interface required:</strong> <code>robot.run(text)</code> returns a result responding to <code>.reply</code>. If <code>run</code> accepts a <code>tools:</code> keyword (as <code>RobotLab::Robot#run</code> does), the adapter passes <code>tools: :inherit</code> in every mode so the robot's attached tools are offered to the model.</p>
 <p>Use <code>:none</code> when your robot never calls <code>AskUser</code> or reads from stdin.</p>
 <h2 id="a2a_tool-mode"><code>:a2a_tool</code> mode<a class="headerlink" href="#a2a_tool-mode" title="Permanent link">&para;</a></h2>
-<p>The server injects an <code>AskUserTool</code> instance into <code>robot.local_tools</code> before the robot thread starts, and removes it on teardown. <code>AskUserTool</code> is a drop-in replacement for <code>RobotLab::AskUser</code> that uses <code>Queue</code> instead of <code>$stdin</code>.</p>
+<p>The adapter injects an <code>AskUserTool</code> instance into <code>robot.local_tools</code> at the start of the robot thread (taking the place of any <code>RobotLab::AskUser</code> already there), and restores the robot's original tool list on teardown. <code>AskUserTool</code> is a drop-in replacement for <code>RobotLab::AskUser</code> that uses <code>Queue</code> instead of <code>$stdin</code>.</p>
 <p><strong>Turn 1 — initial request:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:7000/my-robot/tasks/send<span class="w"> </span><span class="se">\</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:7000/planner<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"message": {"role": "user", "parts": [{"text": "Plan a trip"}]}}'</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"jsonrpc": "2.0", "id": "1", "method": "tasks/send",</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="s1">       "params": {"message": {"role": "user", "parts": [{"text": "Plan a trip"}]}}}'</span>
 </span></code></pre></div>
 <p>The server starts the robot on a new Thread, keyed in <code>Registry</code> by the A2A task ID. When the robot calls <code>AskUser</code>, <code>AskUserTool#execute</code>:</p>
 <ol>
-<li>Pushes <code>{type: :ask, prompt: "Where do you want to go?"}</code> onto <code>event_queue</code>.</li>
+<li>Pushes <code>{type: :ask, prompt: &lt;agent message "Where do you want to go?"&gt;}</code> onto <code>event_queue</code>.</li>
 <li>Blocks on <code>answer_queue</code>.</li>
 </ol>
-<p>The SSE stream delivers an <code>input_required</code> event to the client containing the prompt text and the task ID.</p>
+<p>The <code>tasks/send</code> response is the task in state <code>input_required</code>: <code>result.id</code> is the task ID and <code>result.status.message</code> carries the prompt text.</p>
 <p><strong>Turn 2 — resume:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:7000/my-robot/tasks/send<span class="w"> </span><span class="se">\</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:7000/planner<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="s1">    "task_id": "&lt;task-id-from-turn-1&gt;",</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s1">    "message": {"role": "user", "parts": [{"text": "Paris"}]}</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="s1">  }'</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"jsonrpc": "2.0", "id": "2", "method": "tasks/send",</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="s1">       "params": {</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s1">         "id": "&lt;task-id-from-turn-1&gt;",</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="s1">         "message": {"role": "user", "parts": [{"text": "Paris"}]}</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="s1">       }}'</span>
 </span></code></pre></div>
-<p><code>simple_a2a</code> routes this to the resume handler. The server looks up the task in <code>Registry</code>, places <code>"Paris"</code> onto <code>answer_queue</code>, and the blocked <code>AskUserTool#execute</code> returns <code>"Paris"</code> to the robot. The robot continues. If it calls <code>AskUser</code> again, the cycle repeats. When the robot finishes, a <code>task_complete</code> event closes the SSE stream.</p>
+<p>Because <code>params.id</code> names an <code>input_required</code> task, <code>simple_a2a</code> hands the executor a <code>ResumeContext</code> (resume is only available through <code>tasks/send</code>; <code>tasks/sendSubscribe</code> always starts a new task). The adapter looks up the task in <code>Registry</code>, places <code>"Paris"</code> onto <code>answer_queue</code>, and the blocked <code>AskUserTool#execute</code> returns <code>"Paris"</code> to the robot. The robot continues. If it calls <code>AskUser</code> again, the cycle repeats. When the robot finishes, the response is the task in state <code>completed</code> with the reply as its artifact.</p>
 <p><strong>Setup:</strong></p>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">interactive</span><span class="p">:</span><span class="w"> </span><span class="ss">:a2a_tool</span><span class="p">)</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">interactive</span><span class="p">:</span><span class="w"> </span><span class="ss">:a2a_tool</span><span class="p">,</span><span class="w"> </span><span class="ss">port</span><span class="p">:</span><span class="w"> </span><span class="mi">7000</span><span class="p">)</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="o">.</span><span class="n">add_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="nb">name</span><span class="p">:</span><span class="w"> </span><span class="s2">"Planner"</span><span class="p">,</span><span class="w"> </span><span class="ss">description</span><span class="p">:</span><span class="w"> </span><span class="s2">"Plans trips interactively"</span><span class="p">)</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">port</span><span class="p">:</span><span class="w"> </span><span class="mi">7000</span><span class="p">)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="o">.</span><span class="n">run</span>
 </span></code></pre></div>
 <p><strong>Robot interface required:</strong></p>
 <ul>
 <li><code>robot.run(text)</code> — entry point.</li>
-<li><code>robot.local_tools</code> — mutable <code>Array</code> that the server prepends <code>AskUserTool</code> to. The instance variable is <code>@local_tools</code>.</li>
+<li><code>robot.local_tools</code> — <code>Array</code> reader backed by the instance variable <code>@local_tools</code>, which the adapter replaces with a copy that has <code>AskUserTool</code> appended.</li>
 </ul>
 <p><strong>Important:</strong> Interactive resume requires a build of <code>simple_a2a</code> that includes <code>ResumeContext</code> support. See <a href="../getting-started/#installation">Getting Started — Installation</a> for the path dependency pattern.</p>
 <h2 id="io_bridge-mode"><code>:io_bridge</code> mode<a class="headerlink" href="#io_bridge-mode" title="Permanent link">&para;</a></h2>
-<p>For robots that communicate via raw Ruby IO (<code>puts</code>/<code>gets</code>) rather than the <code>AskUser</code> tool. The server replaces <code>robot.input</code> and <code>robot.output</code> with an <code>IoBridge</code> instance before starting the robot thread, and restores the originals on teardown.</p>
+<p>For robots that communicate via raw Ruby IO (<code>puts</code>/<code>gets</code>) rather than the <code>AskUser</code> tool. The server replaces <code>robot.input</code> and <code>robot.output</code> with an <code>IoBridge</code> instance at the start of the robot thread, and restores the previous streams on teardown.</p>
 <p><code>IoBridge</code> behaviour:</p>
 <ul>
 <li><strong>Writes</strong> (<code>write</code>, <code>puts</code>, <code>print</code>) — accumulate into an internal buffer.</li>
-<li><strong><code>gets</code></strong> — flushes the buffer as an <code>input_required</code> SSE event (the buffered text becomes the prompt), then blocks on <code>answer_queue</code> until the A2A client resumes. The answer is returned from <code>gets</code> to the robot.</li>
+<li><strong><code>gets</code></strong> — flushes the buffer as the <code>input_required</code> prompt (the buffered text, stripped, becomes the prompt; <code>"Input required:"</code> if nothing was written), then blocks on <code>answer_queue</code> until the A2A client resumes. The answer is returned from <code>gets</code> to the robot with a trailing newline.</li>
 </ul>
 <p>The two-turn client pattern is identical to <code>:a2a_tool</code>.</p>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">interactive</span><span class="p">:</span><span class="w"> </span><span class="ss">:io_bridge</span><span class="p">)</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="no">RobotLab</span><span class="o">::</span><span class="no">A2A</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">interactive</span><span class="p">:</span><span class="w"> </span><span class="ss">:io_bridge</span><span class="p">,</span><span class="w"> </span><span class="ss">port</span><span class="p">:</span><span class="w"> </span><span class="mi">7000</span><span class="p">)</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="o">.</span><span class="n">add_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span><span class="w"> </span><span class="nb">name</span><span class="p">:</span><span class="w"> </span><span class="s2">"IO Robot"</span><span class="p">,</span><span class="w"> </span><span class="ss">description</span><span class="p">:</span><span class="w"> </span><span class="s2">"Uses gets/puts for interaction"</span><span class="p">)</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">port</span><span class="p">:</span><span class="w"> </span><span class="mi">7000</span><span class="p">)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="o">.</span><span class="n">run</span>
 </span></code></pre></div>
 <p><strong>Robot interface required:</strong></p>
 <ul>
@@ -840,7 +840,7 @@
 </tr>
 <tr>
 <td><code>:a2a_tool</code></td>
-<td><code>robot.run(text)</code> + mutable <code>robot.local_tools</code></td>
+<td><code>robot.run(text)</code> + <code>robot.local_tools</code> backed by <code>@local_tools</code></td>
 <td>Robots that use <code>RobotLab::AskUser</code> as a tool</td>
 </tr>
 <tr>
