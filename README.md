@@ -85,8 +85,8 @@ Full documentation lives in [`docs/`](docs/):
 ```bash
 bin/setup        # install dependencies
 rake test        # run the full test suite
-rake quality     # static analysis (if configured)
-rake build       # build the gem package
+asgard quality   # static analysis quality gates
+asgard build     # build the gem package
 ```
 
 Run a single test file:

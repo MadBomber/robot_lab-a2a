@@ -16,6 +16,11 @@ module RobotLab
     #
     # Interactive modes keep the robot thread alive between A2A INPUT_REQUIRED
     # and resume. Only works with in-process (Memory) storage.
+    #
+    # :reek:DataClump -- robot plus its event/answer queue pair thread through
+    # the per-mode injection helpers; a wrapper object would outlive its one use.
+    # :reek:RepeatedConditional -- @interactive is the adapter's mode switch;
+    # run, setup and teardown each dispatch on it once.
     class RobotAdapter < ::A2A::Server::AgentExecutor
       VALID_MODES = %i[none a2a_tool io_bridge].freeze
 
@@ -55,6 +60,8 @@ module RobotLab
 
       # ── :none mode ────────────────────────────────────────────
 
+      # :reek:FeatureEnvy -- executor lifecycle: drives start/complete/emit on
+      # the request context handed to it by the A2A server.
       def run_simple(context, input_text)
         context.task.start!
         context.emit_status
@@ -70,6 +77,8 @@ module RobotLab
 
       # ── interactive modes ─────────────────────────────────────
 
+      # :reek:FeatureEnvy -- resume-vs-fresh dispatch on the request context;
+      # the fail/emit calls belong to the A2A task lifecycle, not another home.
       def run_interactive(context, input_text, task_id)
         if context.is_a?(::A2A::Server::ResumeContext)
           entry = Registry.fetch(task_id)
@@ -85,6 +94,8 @@ module RobotLab
         end
       end
 
+      # :reek:TooManyStatements -- linear bootstrap of one interactive run:
+      # build queues, start task, spawn robot thread, register, then monitor.
       def start_interactive_run(context, input_text, task_id)
         event_queue  = Queue.new
         answer_queue = Queue.new
@@ -116,21 +127,20 @@ module RobotLab
 
       def monitor_task(context, entry, _task_id)
         event = entry.event_queue.pop
+        task  = context.task
         case event[:type]
         when :ask
-          context.task.require_input!(message: event[:prompt])
-          context.emit_status(final: true)
+          task.require_input!(message: event[:prompt])
         when :done
           artifact = ::A2A::Models::Artifact.new(
             parts: [::A2A::Models::Part.text(event[:reply].to_s)],
             name: 'reply'
           )
-          context.task.complete!(artifacts: [artifact])
-          context.emit_status(final: true)
+          task.complete!(artifacts: [artifact])
         when :error
-          context.task.fail!(message: event[:error].message)
-          context.emit_status(final: true)
+          task.fail!(message: event[:error].message)
         end
+        context.emit_status(final: true)
       end
 
       # ── interactive setup / teardown ──────────────────────────

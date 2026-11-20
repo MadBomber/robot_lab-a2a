@@ -5,7 +5,8 @@
 module RobotLab
   class Tool
     def self.description(text = nil); end
-    def self.param(name, **opts); end
+    # ruby_llm 2.0 tool DSL
+    def self.parameter(name, **opts); end
     def initialize(**opts); end
   end
 

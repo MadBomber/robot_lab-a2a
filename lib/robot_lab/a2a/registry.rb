@@ -4,6 +4,9 @@ module RobotLab
   module A2A
     # Tracks live robot threads for in-progress interactive runs.
     # Keyed by A2A task_id. Entries are removed when the robot thread finishes.
+    #
+    # :reek:InstanceVariableAssumption -- @mutex and @entries are class-level
+    # singleton state, assigned once in the class body; there is no #initialize.
     class Registry
       Entry = Data.define(:thread, :event_queue, :answer_queue)
 
